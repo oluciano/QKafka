@@ -1,0 +1,82 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>qKafka</name>
+    </assembly>
+    <members>
+        <member name="T:QKafka.IKafkaConsumer`1">
+            <summary>
+            Defines a consumer for a specific message type.
+            </summary>
+            <typeparam name="TMessage">The type of message to consume.</typeparam>
+        </member>
+        <member name="M:QKafka.IKafkaConsumer`1.ConsumeAsync(`0,QKafka.IKafkaContext)">
+            <summary>
+            Consumes the message asynchronously.
+            </summary>
+            <param name="message">The incoming message payload.</param>
+            <param name="context">The execution context for the consumer.</param>
+            <returns>A task representing the asynchronous operation.</returns>
+        </member>
+        <member name="T:QKafka.IKafkaContext">
+            <summary>
+            Provides execution context for the current message consumption.
+            </summary>
+        </member>
+        <member name="P:QKafka.IKafkaContext.CancellationToken">
+            <summary>
+            Gets the cancellation token for the current execution.
+            </summary>
+        </member>
+        <member name="P:QKafka.IKafkaContext.Partition">
+            <summary>
+            Gets the partition number from which the message was consumed.
+            </summary>
+        </member>
+        <member name="P:QKafka.IKafkaContext.Offset">
+            <summary>
+            Gets the offset of the consumed message.
+            </summary>
+        </member>
+        <member name="P:QKafka.IKafkaContext.Key">
+            <summary>
+            Gets the key of the message.
+            </summary>
+        </member>
+        <member name="P:QKafka.IKafkaContext.Headers">
+            <summary>
+            Gets the headers associated with the message.
+            </summary>
+        </member>
+        <member name="M:QKafka.IKafkaContext.PublishAsync``1(``0,System.String)">
+            <summary>
+            Publishes a message to a topic.
+            </summary>
+            <typeparam name="TMessage">The type of the message.</typeparam>
+            <param name="message">The message payload.</param>
+            <param name="key">Optional partition key.</param>
+            <returns>A task representing the asynchronous publish operation.</returns>
+        </member>
+        <member name="T:QKafka.KafkaConsumerAttribute">
+            <summary>
+            Configures routing and group details for a consumer.
+            </summary>
+        </member>
+        <member name="M:QKafka.KafkaConsumerAttribute.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:QKafka.KafkaConsumerAttribute"/> class.
+            </summary>
+            <param name="topic">The topic to consume from.</param>
+        </member>
+        <member name="P:QKafka.KafkaConsumerAttribute.Topic">
+            <summary>
+            Gets the Kafka topic to consume.
+            </summary>
+        </member>
+        <member name="P:QKafka.KafkaConsumerAttribute.GroupId">
+            <summary>
+            Gets or sets the Consumer Group ID. If null, a convention-based Group ID will be generated.
+            </summary>
+        </member>
+    </members>
+</doc>
