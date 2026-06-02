@@ -30,6 +30,7 @@ bld/
 
 # NuGet Packages
 *.nupkg
+[Nn]upkg/
 # The packages folder can be ignored because of Package Restore
 **/packages/*
 # except build/, etc.
