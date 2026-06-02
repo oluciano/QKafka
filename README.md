@@ -134,11 +134,35 @@ qKafka uses bounded in-memory channels to decouple polling from execution, yield
 ## Roadmap
 
 ```
-Phase 1  ⏳ Motor Core: ConsumerLoop, separate poll/work threads, partition key workers
-Phase 2  ⏳ Confiabilidade Extrema: Outbox & Inbox patterns, async outbox publisher
-Phase 3  ⏳ Motor de Sagas: Correlation router, automatic compensation, atomic saga state
-Phase 4  ⏳ Dashboard: Lag monitor, Saga Timeline, live Message Streamer
-Phase 5  ⏳ Test Harness: InMemoryKafkaTestHarness with rich assert verification
+Phase 1 — Core Engine         (v0.1.0)
+  ⏳ ConsumerLoop with dedicated poll thread & rebalance protection
+  ⏳ ChannelDispatcher with fixed worker pool (key-based ordering)
+  ⏳ Middleware pipeline (Logging, OTel, DI Scope, Inbox, Retry)
+  ⏳ Retry policy with exponential backoff & Dead Letter Topic (DLT)
+  ⏳ Standalone producer (IKafkaPublisher) — Direct and Outbox modes
+  ⏳ CI pipeline (build + test on every push)
+
+Phase 2 — Reliability         (v0.2.0)
+  ⏳ Transactional Outbox & Inbox patterns
+  ⏳ EF Core integration (PostgreSQL, SQL Server)
+  ⏳ Async OutboxPublisher background service
+
+Phase 3 — Sagas               (v0.3.0)
+  ⏳ Correlation router & saga discovery
+  ⏳ Handler-based and Fluent DSL state machines
+  ⏳ Automatic LIFO compensation
+  ⏳ Atomic saga state + outbox commit
+
+Phase 4 — Dashboard           (v0.4.0)
+  ⏳ Embedded ASP.NET Core middleware (zero extra infra)
+  ⏳ Consumer lag explorer
+  ⏳ Saga lifecycle tracker
+  ⏳ Live message streamer (SSE)
+
+Phase 5 — Test Harness        (v1.0.0)
+  ⏳ InMemoryKafkaTestHarness
+  ⏳ Fluent assertions (AssertConsumed, AssertPublished)
+  ⏳ In-memory saga & outbox support
 ```
 
 ---

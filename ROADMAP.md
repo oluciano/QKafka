@@ -38,42 +38,45 @@ qKafka solves the complexities of Apache Kafka in .NET by combining the robustne
 
 ## 📅 Step-by-Step Action Plan (Phases)
 
-### Phase 1: Core Engine (Consumption and Publishing)
-*Focus: Establish base communication and the protected consumption loop.*
-- [ ] Implement the `ConsumerLoop` abstraction over `Confluent.Kafka`.
-- [ ] Create physical isolation between the Polling Thread and the message processing Thread Pool.
-- [ ] Implement in-memory partitioning by key (`Partition Key`) to ensure messages with the same ID run sequentially, maintaining strict order.
-- [ ] Create the automatic *Poison Pill* handling infrastructure (redirect serialization failures to a Dead Letter Topic and automatically commit the offset).
-- [ ] Add native support for **OpenTelemetry** header propagation (W3C Tracing).
-- [ ] **MassTransit Parity:** Implement polymorphic deserialization (multiple messages on a single topic/consumer) and extensible integration with Schema Registry (Avro, Protobuf, JSON Schema).
-- [ ] **MassTransit Parity:** Implement Request/Response Client (`IRequestClient<TRequest, TResponse>`) over temporary topics or partition-based correlation.
+### Phase 1 — Core Engine (v0.1.0)
+*Focus: Establish the protected consumption loop and the standalone producer.*
+- [ ] Implement `ConsumerLoop` with dedicated poll thread & rebalance protection
+- [ ] Implement `ChannelDispatcher` with fixed worker pool and key-based ordering
+- [ ] Build middleware pipeline: Logging → OTel → DI Scope → Inbox → Retry → Execution
+- [ ] Implement retry policy with exponential backoff (`RetryMiddleware`, `RetryPolicy`)
+- [ ] Implement Dead Letter Topic routing (`IDltPublisher`) for Poison Pills and exhausted retries
+- [ ] Implement standalone producer (`IKafkaPublisher`) in Direct Mode and Outbox Mode
+- [ ] Set up CI pipeline with GitHub Actions: `dotnet build` + `dotnet test` on every push
 
-### Phase 2: Extreme Reliability (Outbox & Inbox)
-*Focus: At-Least-Once delivery and Exactly-Once processing (idempotency) guarantees.*
-- [ ] **Outbox Pattern:** Create database transaction interceptor (Postgres/SQL/Mongo) to save outbound messages in the same logical transaction as application state mutations.
-- [ ] **Inbox Pattern:** Create automatic duplicate-checking middleware based on a unique idempotency key before invoking the consumer.
-- [ ] Create the background asynchronous publisher to read from the Outbox table and send to Kafka resiliently.
-- [ ] **MassTransit Parity (Claim Check / Message Data):** Add support for large payloads (>1MB) by automatically saving bytes to Object Storage (AWS S3, Azure Blob, MinIO) and publishing only metadata/references via Kafka.
+### Phase 2 — Reliability (v0.2.0)
+*Focus: At-Least-Once delivery and Exactly-Once processing guarantees.*
+- [ ] Implement Transactional Outbox pattern with database-backed `IOutboxStore`
+- [ ] Implement Inbox idempotency guard with `IInboxStore`
+- [ ] EF Core integration for PostgreSQL and SQL Server (`AddEntityFrameworkOutbox<TContext>`)
+- [ ] Async `OutboxPublisher` background service with `SKIP LOCKED` concurrency control
 
-### Phase 3: Saga Engine (`QKafka.Sagas`)
+### Phase 3 — Sagas (v0.3.0)
 *Focus: Distributed transactions that are easy to program and debug.*
-- [ ] Implement Saga base classes and pluggable state persistence repositories (`ISagaRepository`).
-- [ ] Create the automatic message correlation router based on payload properties or headers (`CorrelationId`).
-- [ ] Develop the infrastructure to execute automatic compensating actions in reverse order (LIFO) if a Saga step fails.
-- [ ] Guarantee absolute atomicity: Saga state updates and Outbox message writes must occur in a single database transaction.
-- [ ] **MassTransit Parity (Message Scheduling):** Create support for message scheduling (delayed publishing) integrated with Background Job providers (Quartz.NET, Hangfire).
+- [ ] Implement saga discovery via reflection (`IStartSaga<T>`, `IHandleSaga<T>`)
+- [ ] Implement correlation resolver (`ICorrelateSaga<T>`, property convention, DLT fallback)
+- [ ] Handler-based Saga (`Saga<TState>`) and Fluent DSL (`KafkaStateMachine<TState>`)
+- [ ] Automatic LIFO compensation on failure (`context.RegisterCompensation`)
+- [ ] Atomic saga state + outbox commit in a single database transaction
+- [ ] EF Core saga repository (`ISagaRepository<TState>`) with optimistic concurrency
 
-### Phase 4: Telemetry & Dashboard (`QKafka.Dashboard`)
-*Focus: Immediate operational visibility for developers.*
-- [ ] Create the visual dashboard integrated into the host application (no extra infrastructure required).
-- [ ] **Lag Monitor:** Real-time visualization of pending messages per partition and consumer group.
-- [ ] **Saga Timeline:** View historical and live state transition timelines for any active or completed Saga instance.
-- [ ] **Message Streamer:** Live formatted JSON view of payloads flowing through local consumer loops.
+### Phase 4 — Dashboard (v0.4.0)
+*Focus: Immediate operational visibility with zero extra infrastructure.*
+- [ ] Embedded ASP.NET Core middleware (`app.UseqKafkaDashboard("/qkafka")`)
+- [ ] Consumer lag explorer (per partition, per group, real-time offsets)
+- [ ] Saga lifecycle tracker (searchable, interactive state transition timeline)
+- [ ] Live message streamer via Server-Sent Events (SSE)
 
-### Phase 5: In-Memory Test Harness (`QKafka.Testing`)
-*Focus: Enable fast unit tests and high-fidelity mock environments.*
-- [ ] Develop `InMemoryKafkaTestHarness` to emulate topics, partitions, producers, consumers, and Saga behavior in memory.
-- [ ] **MassTransit Parity:** Allow clean and complete test assertions (e.g. `harness.AssertPublished<OrderPlacedEvent>()`, `harness.AssertConsumed<OrderPlacedEvent>()`, verification of Saga final states, and retries).
+### Phase 5 — Test Harness (v1.0.0)
+*Focus: Fast, deterministic tests without Docker.*
+- [ ] `InMemoryKafkaTestHarness` — full in-memory Kafka emulation
+- [ ] Fluent assertions: `AssertConsumed<T>`, `AssertPublished<T>` with timeout support
+- [ ] In-memory outbox and saga state support
+- [ ] DLT register assertions (`AssertRoutedToDlt<T>`)
 
 ---
 
