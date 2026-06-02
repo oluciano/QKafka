@@ -1,78 +1,85 @@
-# ROADMAP — Plano de Ação para o qKafka
+# ROADMAP — qKafka Action Plan
 
-Este documento serve como o guia estratégico e plano de ação para o desenvolvimento do **qKafka** (ou **QKafka**). O objetivo principal é construir uma alternativa ao MassTransit para Kafka no ecossistema .NET que seja **gratuita (MIT)**, **Kafka-First** (respeitando a arquitetura do broker) e **infinitamente mais simples de configurar e depurar**.
-
----
-
-## 🎯 A Visão do Projeto
-O `qKafka` resolve as complexidades do Apache Kafka no .NET combinando a robustez de Sagas e Outbox do MassTransit com a alta performance e simplicidade operacional.
-
-### Diferenciais Competitivos
-1. **MIT License:** 100% gratuito, livre das amarras comerciais da v9 do MassTransit.
-2. **Kafka-First:** Não tenta simular filas clássicas (como RabbitMQ). Abraça partições, chaves e offsets lineares nativamente.
-3. **Proteção de Loop:** Thread de Polling separada dos Workers, impedindo *Rebalance Storms* causados por códigos lentos.
-4. **Configuração via Convenção:** Source Generators eliminam o excesso de boilerplate de configuração (DX de ponta).
-5. **Dashboard Embutido:** Visibilidade de Lag, fluxo de mensagens e status das Sagas em tempo real sem dependências externas.
+This document serves as the strategic guide and action plan for the development of **qKafka**. The main goal is to build a .NET 8+ alternative to MassTransit for Kafka that is **free (MIT licensed)**, **Kafka-First** (respecting the broker's native architecture), and **infinitely simpler to configure and debug**.
 
 ---
 
-## 🛠️ Arquitetura de Referência
+## 🎯 Project Vision
+qKafka solves the complexities of Apache Kafka in .NET by combining the robustness of MassTransit's Sagas and Outbox with high performance and operational simplicity.
+
+**Strategic Mandate:** Our goal is to cover **100% of MassTransit's critical capabilities for Kafka** (resilience, complex Sagas, Outbox/Inbox patterns, polymorphic serialization, and testability) and **go much further**, resolving MassTransit's architectural limitations, licensing issues, and inherent complexities.
+
+### Competitive Advantages (Parity + Beyond)
+1. **MIT License (100% Free):** Free from the commercial constraints of MassTransit v9.
+2. **Kafka-First vs. Simulated Queue:** Does not try to simulate classic queues (like RabbitMQ). Embraces partitions, keys, and linear offsets natively.
+3. **Real Heartbeat Protection (Beyond MT):** Polling thread decoupled from Workers via bounded in-memory channels, preventing *Rebalance Storms* even during extremely long-running business processes.
+4. **Ultra-Simple Configuration (Beyond MT):** Source Generators eliminate massive configuration and DI registration boilerplate.
+5. **Native Dashboard (Beyond MT):** Integrated visual panel for Lag monitoring, live message streaming, and real-time Saga lifecycle timelines.
+6. **Safe Concurrency by Key (Beyond MT):** Allows high concurrency per partition while strictly guaranteeing sequential processing for messages sharing the same Partition Key.
+
+---
+
+## 🛠️ Reference Architecture
 
 ```
-                        [ Banco de Dados ] 
-                         ▲            │
-            Inbox Check  │            ▼ Outbox Commits & Saga State
-                         │      ┌─────────────┐
-                         │      │   qKafka    │
-                         │      │ Dispatcher  │
-                         │      └──────┬──────┘
-                         │             │ Publish events
-                         │             ▼
+                        [ Database ] 
+                          ▲            │
+             Inbox Check  │            ▼ Outbox Commits & Saga State
+                          │      ┌─────────────┐
+                          │      │   qKafka    │
+                          │      │ Dispatcher  │
+                          │      └──────┬──────┘
+                          │             │ Publish events
+                          │             ▼
 [ Kafka Consumer ] ──► [ Inbox ] ──► [ Saga State Machine ] ──► [ Outbox ] ──► [ Kafka Producer ]
 ```
 
 ---
 
-## 📅 Plano de Ação Passo a Passo (Fases)
+## 📅 Step-by-Step Action Plan (Phases)
 
-### Fase 1: O Motor Core (Consumo e Envio)
-*Foco: Estabelecer a comunicação base e o loop de consumo protegido.*
-- [ ] Implementar a abstração do `ConsumerLoop` sobre o `Confluent.Kafka`.
-- [ ] Criar a separação física da Thread de Polling e do Thread Pool de processamento de mensagens.
-- [ ] Implementar o particionamento em memória por chave (`Partition Key`) para garantir que mensagens com o mesmo ID rodem sequencialmente, mantendo a ordem correta.
-- [ ] Criar a infraestrutura de tratamento automático de *Poison Pills* (redirecionar falhas de serialização para tópicos de erro e comitar o offset automaticamente).
-- [ ] Adicionar suporte nativo à propagação de cabeçalhos do **OpenTelemetry** (W3C Tracing).
+### Phase 1: Core Engine (Consumption and Publishing)
+*Focus: Establish base communication and the protected consumption loop.*
+- [ ] Implement the `ConsumerLoop` abstraction over `Confluent.Kafka`.
+- [ ] Create physical isolation between the Polling Thread and the message processing Thread Pool.
+- [ ] Implement in-memory partitioning by key (`Partition Key`) to ensure messages with the same ID run sequentially, maintaining strict order.
+- [ ] Create the automatic *Poison Pill* handling infrastructure (redirect serialization failures to a Dead Letter Topic and automatically commit the offset).
+- [ ] Add native support for **OpenTelemetry** header propagation (W3C Tracing).
+- [ ] **MassTransit Parity:** Implement polymorphic deserialization (multiple messages on a single topic/consumer) and extensible integration with Schema Registry (Avro, Protobuf, JSON Schema).
+- [ ] **MassTransit Parity:** Implement Request/Response Client (`IRequestClient<TRequest, TResponse>`) over temporary topics or partition-based correlation.
 
-### Fase 2: Confiabilidade Extrema (Outbox & Inbox)
-*Foco: Garantias de entrega At-Least-Once e Exactly-Once (idempotência).*
-- [ ] **Outbox Pattern:** Criar interceptador de transações do banco de dados (Postgres/SQL/Mongo) para salvar as mensagens de saída na mesma transação lógica das mutações de estado da aplicação.
-- [ ] **Inbox Pattern:** Criar middleware automático de verificação de duplicidade de mensagens baseada em chave única de idempotência antes de disparar o consumidor.
-- [ ] Criar o componente de publicação assíncrona em segundo plano para ler da tabela do Outbox e enviar ao Kafka de forma resiliente.
+### Phase 2: Extreme Reliability (Outbox & Inbox)
+*Focus: At-Least-Once delivery and Exactly-Once processing (idempotency) guarantees.*
+- [ ] **Outbox Pattern:** Create database transaction interceptor (Postgres/SQL/Mongo) to save outbound messages in the same logical transaction as application state mutations.
+- [ ] **Inbox Pattern:** Create automatic duplicate-checking middleware based on a unique idempotency key before invoking the consumer.
+- [ ] Create the background asynchronous publisher to read from the Outbox table and send to Kafka resiliently.
+- [ ] **MassTransit Parity (Claim Check / Message Data):** Add support for large payloads (>1MB) by automatically saving bytes to Object Storage (AWS S3, Azure Blob, MinIO) and publishing only metadata/references via Kafka.
 
-### Fase 3: O Motor de Sagas (`QKafka.Sagas`)
-*Foco: Transações distribuídas fáceis de programar e depurar.*
-- [ ] Implementar as classes base de Saga e os repositórios plugáveis de persistência de estado (`ISagaRepository`).
-- [ ] Criar o roteador de correlação automática de mensagens baseado em propriedades de payload ou cabeçalhos (`CorrelationId`).
-- [ ] Desenvolver a infraestrutura para rodar ações compensatórias automáticas em ordem reversa caso uma etapa da Saga falhe.
-- [ ] Garantir atomicidade absoluta: A persistência do estado da Saga e a gravação de novos eventos no Outbox devem ocorrer em um único comando de banco.
+### Phase 3: Saga Engine (`QKafka.Sagas`)
+*Focus: Distributed transactions that are easy to program and debug.*
+- [ ] Implement Saga base classes and pluggable state persistence repositories (`ISagaRepository`).
+- [ ] Create the automatic message correlation router based on payload properties or headers (`CorrelationId`).
+- [ ] Develop the infrastructure to execute automatic compensating actions in reverse order (LIFO) if a Saga step fails.
+- [ ] Guarantee absolute atomicity: Saga state updates and Outbox message writes must occur in a single database transaction.
+- [ ] **MassTransit Parity (Message Scheduling):** Create support for message scheduling (delayed publishing) integrated with Background Job providers (Quartz.NET, Hangfire).
 
-### Fase 4: Telemetria e Dashboard (`QKafka.Dashboard`)
-*Foco: Visibilidade operacional imediata para o desenvolvedor.*
-- [ ] Criar o painel visual integrado à aplicação (sem infraestrutura extra).
-- [ ] **Lag Monitor:** Visualização em tempo real de mensagens pendentes por partição e grupo de consumo.
-- [ ] **Saga Timeline:** Visualizar o histórico e linha do tempo de transições de estado de qualquer instância de Saga ativa ou finalizada.
-- [ ] **Message Streamer:** Visualização ao vivo (JSON formatado) do payload das mensagens trafegando nos tópicos locais.
+### Phase 4: Telemetry & Dashboard (`QKafka.Dashboard`)
+*Focus: Immediate operational visibility for developers.*
+- [ ] Create the visual dashboard integrated into the host application (no extra infrastructure required).
+- [ ] **Lag Monitor:** Real-time visualization of pending messages per partition and consumer group.
+- [ ] **Saga Timeline:** View historical and live state transition timelines for any active or completed Saga instance.
+- [ ] **Message Streamer:** Live formatted JSON view of payloads flowing through local consumer loops.
 
-### Fase 5: In-Memory Test Harness (`QKafka.Testing`)
-*Foco: Permitir testes unitários rápidos e mock de alta fidelidade.*
-- [ ] Desenvolver o `InMemoryKafkaTestHarness` para emular tópicos, partições, produtores, consumidores e comportamento de Sagas na memória do computador.
-- [ ] Permitir asserções limpas nos testes (ex: `harness.AssertPublished<OrderPlacedEvent>()`).
+### Phase 5: In-Memory Test Harness (`QKafka.Testing`)
+*Focus: Enable fast unit tests and high-fidelity mock environments.*
+- [ ] Develop `InMemoryKafkaTestHarness` to emulate topics, partitions, producers, consumers, and Saga behavior in memory.
+- [ ] **MassTransit Parity:** Allow clean and complete test assertions (e.g. `harness.AssertPublished<OrderPlacedEvent>()`, `harness.AssertConsumed<OrderPlacedEvent>()`, verification of Saga final states, and retries).
 
 ---
 
-## 🛡️ Invariantes do Código
-Qualquer nova funcionalidade no projeto deve respeitar as seguintes regras (conforme o [foundation-minimal.md](file:///home/luciano/git/qKafka/ai-method/core/00-foundation-minimal.md)):
-1. O banco de dados de persistência é a **única fonte da verdade**.
-2. **Heartbeats do Kafka** nunca devem ser atrasados por processos de negócio.
-3. Toda funcionalidade deve produzir testes cobrindo a **Matriz 3N** (Positivo, Negativo, Inválido/Limite).
-4. Compilação **Release** exige **zero avisos** (warnings).
+## 🛡️ Code Invariants
+Any new feature in the project must respect the following rules (according to [00-foundation-minimal.md](file:///home/luciano/git/qKafka/ai-method/core/00-foundation-minimal.md)):
+1. The persistence database is the **single source of truth**.
+2. **Kafka heartbeats** must never be delayed by business logic.
+3. Every feature must produce tests covering the **3N Matrix** (Positive, Negative, Invalid/Boundary Input).
+4. **Release** builds require **zero warnings** (`TreatWarningsAsErrors = true`).
