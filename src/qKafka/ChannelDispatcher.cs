@@ -36,6 +36,11 @@ public sealed class ChannelDispatcher
     }
 
     /// <summary>
+    /// Gets the partition channels.
+    /// </summary>
+    public IReadOnlyList<Channel<ConsumeResult<byte[], byte[]>>> Channels => _channels;
+
+    /// <summary>
     /// Dispatches the consume result to a bounded channel.
     /// </summary>
     /// <param name="result">The message consume result from Kafka broker.</param>

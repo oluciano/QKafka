@@ -36,6 +36,16 @@ public interface IKafkaContext
     IReadOnlyDictionary<string, byte[]> Headers { get; }
 
     /// <summary>
+    /// Gets the raw message payload bytes.
+    /// </summary>
+    byte[] Payload { get; }
+
+    /// <summary>
+    /// Gets the scoped service provider for dependency resolution.
+    /// </summary>
+    IServiceProvider RequestServices { get; }
+
+    /// <summary>
     /// Publishes a message to a topic.
     /// </summary>
     /// <typeparam name="TMessage">The type of the message.</typeparam>

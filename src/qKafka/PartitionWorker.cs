@@ -14,6 +14,7 @@ internal sealed class PartitionWorker : IDisposable
 {
     private readonly ChannelReader<ConsumeResult<byte[], byte[]>> _reader;
     private readonly Func<IKafkaContext, Task> _pipelineExecutor;
+    private readonly IServiceProvider _serviceProvider;
     private readonly Task _runningTask;
     private readonly CancellationTokenSource _cts;
     private bool _disposed;
@@ -23,12 +24,15 @@ internal sealed class PartitionWorker : IDisposable
     /// </summary>
     /// <param name="reader">The channel reader.</param>
     /// <param name="pipelineExecutor">The middleware/consumer execution pipeline.</param>
+    /// <param name="serviceProvider">The service provider.</param>
     public PartitionWorker(
         ChannelReader<ConsumeResult<byte[], byte[]>> reader,
-        Func<IKafkaContext, Task> pipelineExecutor)
+        Func<IKafkaContext, Task> pipelineExecutor,
+        IServiceProvider serviceProvider)
     {
         _reader = reader ?? throw new ArgumentNullException(nameof(reader));
         _pipelineExecutor = pipelineExecutor ?? throw new ArgumentNullException(nameof(pipelineExecutor));
+        _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         _cts = new CancellationTokenSource();
         _runningTask = Task.Run(() => RunLoopAsync(_cts.Token));
     }
@@ -88,10 +92,13 @@ internal sealed class PartitionWorker : IDisposable
                     : string.Empty;
 
                 var context = new KafkaContext(
+                    result,
                     result.Partition.Value,
                     result.Offset.Value,
                     key,
                     headers,
+                    result.Message.Value ?? Array.Empty<byte>(),
+                    _serviceProvider,
                     cancellationToken);
 
                 try
