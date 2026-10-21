@@ -9,6 +9,11 @@ Before executing any task, read:
 - `ai-method/core/00-foundation-minimal.md` — always, every task
 - Quick router: `ai-method/QUICK_REFERENCE_ULTRA.md`
 
+Then load what the task needs:
+- **Modes** (`ai-method/modes/`): `01-architect-mode` (design, no code), `02-execution-mode`, `03-validation-mode`, `04-release-mode`
+- **Workflows** (`ai-method/workflows/`): `feature`, `bugfix`, `refactor`, `test`, `documentation`, `reliability`, `consumer`, `saga`
+- **Skills** (`.agents/skills/`): `qkafka-task-cycle` (default cycle for any task), `qkafka-docs-truth`, `qkafka-wiki-guardian`, `qkafka-release`
+
 ---
 
 ## Project
