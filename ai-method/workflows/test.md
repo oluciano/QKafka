@@ -34,7 +34,7 @@ A hard rule, enforced by `tests/qKafka.Tests/Conventions/TestLayoutConventionTes
 2. **Same relative path** as the production file. If it lives in `Sagas/Saga.cs`, the test lives in `Sagas/SagaUnitTests.cs`.
 3. **The test class is named after its file** (`FooUnitTests` in `FooUnitTests.cs`) and the file holds a single test class.
 4. **No orphans:** a `*UnitTests.cs` or `*ReliabilityTests.cs` file whose production file does not exist fails the build.
-5. **Exempt from needing a test:** files that declare only interfaces, enums or delegates (no logic). Folder `Conventions/` is exempt from mirroring (repository-rule tests).
+5. **Exempt from needing a test:** files that declare only interfaces, enums or delegates (no logic). Folders `Conventions/` (repository-rule tests) and `Support/` (shared fakes and builders, e.g. `RecordingDltPublisher`) are exempt from mirroring and naming.
 6. **Untested debt is a ratchet:** production files with logic and no test are listed in `tests/qKafka.Tests/Conventions/untested-baseline.txt`. A new file with logic and no test fails. When a test is added, the line must be removed (the test fails otherwise). The list only shrinks.
 
 Internal types are covered through `InternalsVisibleTo`.

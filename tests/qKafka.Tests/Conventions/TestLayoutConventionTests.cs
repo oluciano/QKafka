@@ -143,8 +143,11 @@ public sealed class TestLayoutConventionTests
         return parts.Contains("obj") || parts.Contains("bin");
     }
 
-    private static bool IsExempt(string file, string projectDir) =>
-        Path.GetRelativePath(projectDir, file).Replace('\\', '/').StartsWith("Conventions/", StringComparison.Ordinal);
+    private static bool IsExempt(string file, string projectDir)
+    {
+        var relative = Path.GetRelativePath(projectDir, file).Replace('\\', '/');
+        return relative.StartsWith("Conventions/", StringComparison.Ordinal) || relative.StartsWith("Support/", StringComparison.Ordinal);
+    }
 
     private static string ToProductionPath(string testFile, string projectDir, string suffix)
     {
