@@ -153,6 +153,35 @@ A new package is only justified by a heavy or incompatible dependency (e.g. Sche
 
 ---
 
+## ❓ Open Decisions (before 1.0)
+Decisions that change the public API or the design. Each one is settled by writing the outcome here (done, accepted, or moved to a spec), so the list does not go stale. They are candidates for GitHub issues once there is more than one contributor.
+
+- [ ] **Empty topic:** `KafkaConsumerAttribute` and `ConsumerRegistration` accept an empty or whitespace topic today. Reject it (and where: attribute, registration or startup)?
+- [ ] **Partition listener:** `IPartitionAssignmentListener` is `internal` because it exposes `TopicPartition` from Confluent. Make it public with qKafka-owned types (`[Experimental]` first)?
+- [ ] **Stringly-typed options:** `QKafkaOptions.SaslMechanism` and `SecurityProtocol` are `string?`. Replace with enums or qKafka types.
+- [ ] **Retry naming:** `MaxRetryAttempts = 3` means 4 executions and `attemptCount = 4` in the DLT. Rename (`MaxAttempts`?) or document precisely.
+- [ ] **Custom middleware:** the pipeline is closed (no public registration). Open it as `[Experimental]`, or keep it internal until 1.0?
+- [ ] **`AddqKafkaConsumers()` with no assemblies** throws `ArgumentNullException`. Use `ArgumentException`, or default to the calling assembly.
+- [ ] **Null `Message` in `ChannelDispatcher`:** a `ConsumeResult` with a null `Message` throws `NullReferenceException`. Guard it and route to the DLT, or document the precondition.
+- [ ] **Testing the Confluent-bound files** (`DltPublisher`, `PartitionWorker`, `KafkaConsumerLoop`, the only ones left in the untested baseline): inject `IProducer` into `DltPublisher` and a consumer factory into `KafkaConsumerLoop`, or leave them to the Testcontainers reliability tests in Phase 1.
+- [ ] **`IKafkaContext.PublishAsync`** is a prototype that publishes nothing. Replace it with `IKafkaPublisher` (spec 07) before anyone depends on it.
+- [ ] **Stronger test-layout rule:** require the 3N matrix per test file (`{Scenario}_{Action}_{Result}` names plus `[Trait("N", ...)]`), and a coverlet threshold as a CI gate later.
+
+---
+
+## 🧰 Repository Hygiene
+Cheap, mostly mechanical work that does not depend on the engine.
+
+- [ ] `.github/ISSUE_TEMPLATE/` (bug report, feature request, design decision) and `pull_request_template.md` with the 3N, public API and `dotnet format` checklist.
+- [ ] GitHub labels: `reliability`, `performance`, `rfc`, `backlog`, `in-progress`, `api`, `breaking`.
+- [ ] `SECURITY.md` (private vulnerability reporting) and `dependabot.yml` (NuGet and GitHub Actions; ignore `Microsoft.Extensions.*` major bumps like NexJob does).
+- [ ] CodeQL and OpenSSF Scorecard workflows.
+- [ ] `CHANGELOG.md` (Keep a Changelog, `### Breaking` section) created with the first release `v0.1.0-alpha.1`.
+- [ ] Update `qkafka-task-cycle` so that non-trivial tasks start from an Open Decision or a roadmap item, and link them in the commit.
+- [ ] Rule justification test: every rule disabled in `.editorconfig` carries a reason, enforced by a test.
+
+---
+
 ## 🛡️ Code Invariants
 Any new feature in the project must respect the following rules (according to [00-foundation-minimal.md](file:///home/luciano/git/qKafka/ai-method/core/00-foundation-minimal.md)):
 1. The persistence database is the **single source of truth**.
