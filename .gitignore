@@ -90,3 +90,6 @@ vendor/
 coverage/
 .cache/
 tmp/
+
+# Tool state
+cache/
