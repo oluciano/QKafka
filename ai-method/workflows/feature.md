@@ -30,7 +30,7 @@ Write the tests FIRST:
 - **N3 — Invalid Input:** null, empty payload, corrupt serialization, missing key, boundary values.
 - **Red-First Proof:** run the new tests, watch them fail for the expected reason, commit them first (`test(scope): <description>, red`).
 - **No Fixed Sleeps:** never `Task.Delay(50)` to wait for state. Use `TestWait.UntilAsync`, `TaskCompletionSource`, or an observed signal.
-- **Test Contract Rule:** never weaken, invert or delete an assertion. Fix production code. One canonical `<Class>Tests.cs` per class; no `*HardeningTests.cs` twins.
+- **Test Contract Rule:** never weaken, invert or delete an assertion. Fix production code. One `<Class>UnitTests.cs` per production file at the mirrored path (`<Class>ReliabilityTests.cs` in the reliability project); no `*HardeningTests.cs` twins.
 
 ---
 

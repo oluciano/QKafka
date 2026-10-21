@@ -61,6 +61,8 @@ MIT licensed. Alternative to MassTransit — Kafka-first, rebalance-protected, o
 
 ## Testing Strategy (3N Mandatory Matrix)
 
+Test files mirror production files: `src/qKafka/<path>/Foo.cs` → `tests/qKafka.Tests/<path>/FooUnitTests.cs` (one file per class; `FooReliabilityTests.cs` in the reliability project). Enforced by `TestLayoutConventionTests`.
+
 Every feature or bug fix must produce minimum 3 tests:
 - **N1 — Positive:** happy path works as expected
 - **N2 — Negative:** failure path (e.g. database failure, broker disconnected) fails/behaves as expected

@@ -1,0 +1,20 @@
+# Production files with logic that still have no <path>/<Name>UnitTests.cs. This list only shrinks:
+# remove a line when its unit test is added (the build-time convention test fails if you forget).
+ChannelDispatcher.cs
+ConsumerOptions.cs
+ConsumerRegistration.cs
+DltPublisher.cs
+ExecutionMiddleware.cs
+JsonKafkaMessageDeserializer.cs
+KafkaConsumerAttribute.cs
+KafkaConsumerLoop.cs
+KafkaContext.cs
+KafkaPipelineBuilder.cs
+LoggingMiddleware.cs
+PartitionWorker.cs
+QKafkaOptions.cs
+RetryMiddleware.cs
+RetryOptions.cs
+Sagas/Saga.cs
+ScopeMiddleware.cs
+ServiceCollectionExtensions.cs

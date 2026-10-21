@@ -28,6 +28,8 @@ Every feature or fix needs at least three tests:
 
 Never edit or delete a passing test to make new code pass. Fix the code.
 
+**Test file layout (enforced by a test):** `src/qKafka/<path>/Foo.cs` has exactly one unit test file `tests/qKafka.Tests/<path>/FooUnitTests.cs` (class `FooUnitTests`), and, in `tests/qKafka.ReliabilityTests`, one `<path>/FooReliabilityTests.cs`. Same relative path, no extra test files for the same class, no orphans. Files with only interfaces, enums or delegates need no test. Untested files with logic are tracked in `tests/qKafka.Tests/Conventions/untested-baseline.txt`, a list that only shrinks. Details in `ai-method/workflows/test.md`.
+
 ## Public API and versioning
 
 qKafka is `0.x` until it meets the `1.0.0` criteria in [ROADMAP.md](ROADMAP.md#-versioning--api-stability).

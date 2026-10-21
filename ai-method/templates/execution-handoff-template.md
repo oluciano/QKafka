@@ -32,7 +32,7 @@ Use this to communicate results from execution phase to validation phase.
 - Description of what was added
 - Key responsibilities
 
-**tests/qKafka.Tests/ClassNameTests.cs**
+**tests/qKafka.Tests/<same path as the production file>/ClassNameUnitTests.cs**
 - Test scenarios covered
 
 ### Files Modified

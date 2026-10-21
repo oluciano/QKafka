@@ -142,7 +142,7 @@ Watch for subtle architectural violations:
 - [ ] **NO FIXED SLEEPS:** Absolutely no `Task.Delay(50)` in tests to wait for state. Must use a polling wait helper, `TaskCompletionSource`, or an observed signal. (A sleep is acceptable ONLY to assert that something did NOT happen).
 - [ ] **Search Across ALL Test Projects:** When altering pinned values or behaviors, grep across every project in `tests/`, not just the local test project.
 - [ ] **Existing Tests Are Contracts:** Existing assertions were NEVER weakened, inverted, or deleted to make new code pass. If behavior intentionally changed, a comment `// Behavior changed in vX.Y: <reason>` is required.
-- [ ] **One Canonical Test File per Class:** Production class `Foo` has exactly one test file `FooTests.cs`. Parallel files (`FooHardeningTests.cs`, `FooExtraTests.cs`) are strictly banned.
+- [ ] **One Canonical Test File per Class:** Production file `<path>/Foo.cs` has exactly one unit test file `<path>/FooUnitTests.cs` (and, if a reliability project exists, one `<path>/FooReliabilityTests.cs`). Parallel files (`FooHardeningTests.cs`, `FooExtraTests.cs`) are strictly banned. `TestLayoutConventionTests` enforces it.
 - [ ] **Prove Guard Tests Fail:** Concurrency or ordering guard tests must be proven by reverting the fix and watching the guard test fail.
 - [ ] **Tie Concurrency Assertions to Specific Statement:** Avoid global counters that trip on unrelated rare events.
 - [ ] **No Static State Leaks:** Test helpers with `static` state (e.g. recording DLT publishers) must not share state across parallel test fixtures.

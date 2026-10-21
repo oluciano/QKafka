@@ -23,9 +23,25 @@ Every feature or bug fix produces at least 3 tests:
 - **N2 — Negative:** failure path behaves as specified (retry, DLT, rollback, no commit).
 - **N3 — Invalid Input:** null, empty, boundary, corrupt serialization handled gracefully.
 
+### Test File Layout
+A hard rule, enforced by `tests/qKafka.Tests/Conventions/TestLayoutConventionTests.cs`:
+
+| Production file | Unit test (`tests/qKafka.Tests`) | Reliability test (`tests/qKafka.ReliabilityTests`) |
+|---|---|---|
+| `src/qKafka/<path>/Foo.cs` | `<path>/FooUnitTests.cs` | `<path>/FooReliabilityTests.cs` |
+
+1. **Exactly one** file per production file and per test project. The test type comes from the project and the suffix, never from extra files (`FooHardeningTests.cs`, `FooExtraTests.cs` are banned).
+2. **Same relative path** as the production file. If it lives in `Sagas/Saga.cs`, the test lives in `Sagas/SagaUnitTests.cs`.
+3. **The test class is named after its file** (`FooUnitTests` in `FooUnitTests.cs`) and the file holds a single test class.
+4. **No orphans:** a `*UnitTests.cs` or `*ReliabilityTests.cs` file whose production file does not exist fails the build.
+5. **Exempt from needing a test:** files that declare only interfaces, enums or delegates (no logic). Folder `Conventions/` is exempt from mirroring (repository-rule tests).
+6. **Untested debt is a ratchet:** production files with logic and no test are listed in `tests/qKafka.Tests/Conventions/untested-baseline.txt`. A new file with logic and no test fails. When a test is added, the line must be removed (the test fails otherwise). The list only shrinks.
+
+Internal types are covered through `InternalsVisibleTo`.
+
 ### Core Rules
 - **No Fixed Sleeps:** `Task.Delay(50)` to wait for state is banned. Poll observed state (`TestWait.UntilAsync`), use `TaskCompletionSource` or an observed signal.
-- **One Canonical Test File per Class:** `Foo` → `FooTests.cs`. No `FooHardeningTests.cs` twins.
+- **One Canonical Test File per Class, mirrored path:** see [Test File Layout](#test-file-layout). `src/qKafka/Sagas/Saga.cs` → `tests/qKafka.Tests/Sagas/SagaUnitTests.cs`. No `SagaHardeningTests.cs` twins.
 - **Existing tests are contracts:** never weaken, invert or delete an assertion. Moving/merging into a `[Theory]` and deleting a proven duplicate are allowed.
 - **Dual-Target:** tests pass on `net10.0`.
 - **Real behavior over mocks:** fake the broker boundary (`IKafkaConsumer`, producer), not the code under test.

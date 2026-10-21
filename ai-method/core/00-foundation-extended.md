@@ -119,7 +119,7 @@ Every consumer path (handlers, saga handlers, middleware) must satisfy:
 ## Testing Strategy
 
 ### Test layout
-- Project: `tests/qKafka.Tests` (one canonical `FooTests.cs` per class `Foo`).
+- Project: `tests/qKafka.Tests` (one `FooUnitTests.cs` per production file `Foo.cs`, same relative path; reliability tests use `FooReliabilityTests.cs`; see `ai-method/workflows/test.md`).
 - Prefer real behavior and in-memory/test doubles of the broker over mocks of internals; database-backed tests use real PostgreSQL/SQL Server (Docker) when they depend on locking semantics.
 - Phase 5 adds `InMemoryKafkaTestHarness`; once it exists, prefer it for handler and saga tests.
 
