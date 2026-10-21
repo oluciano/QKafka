@@ -15,7 +15,7 @@ csharp_prefer_braces = true:warning
 # ── StyleCop: rules that conflict with this project's established conventions ──
 
 # SA1309 — field names must not begin with underscore.
-# Our convention is _camelCase for private fields (see CONTRIBUTING.md).
+# Our convention is _camelCase for private fields (see .github/CONTRIBUTING.md).
 dotnet_diagnostic.SA1309.severity = none
 # SX1309 is the complementary rule that REQUIRES the underscore prefix (StyleCop.Analyzers.Unstable).
 dotnet_diagnostic.SX1309.severity = none
@@ -123,6 +123,37 @@ dotnet_diagnostic.SA1201.severity = warning
 dotnet_diagnostic.SA1202.severity = warning
 dotnet_diagnostic.SA1204.severity = warning
 
+# SA1504 (StyleCop 1.3) — all accessors single-line or multi-line.
+# Off: it rejects the `get => field;` + `set { validation }` pair used by the options classes; the rewrite
+# (`get { return field; }`) is noisier and fixes nothing.
+dotnet_diagnostic.SA1504.severity = none
+
+# SA1143 (StyleCop 1.3) — consistent layout of a conditional expression.
+# Off: formatting only; the layouts in use follow line length and readability, and `dotnet format` does not fix it.
+dotnet_diagnostic.SA1143.severity = none
+
+# ── Microsoft.CodeAnalysis.NetAnalyzers (AnalysisMode=Recommended) ───────────
+
+# CA1848 / CA1873 — use LoggerMessage / avoid evaluating log arguments when the level is off.
+# Suggestion: ~200 call sites. Moving them to source-generated LoggerMessage is a separate piece of work,
+# not part of the analyzer upgrade.
+dotnet_diagnostic.CA1848.severity = suggestion
+dotnet_diagnostic.CA1873.severity = suggestion
+
+# CA1859 — prefer concrete types for private members. Suggestion: the private helpers take the interface on
+# purpose (the callers pass lists and arrays); a concrete type brings no measurable gain on these paths.
+dotnet_diagnostic.CA1859.severity = suggestion
+
+# CA1822 — member can be static. Suggestion: `SchemaMigrator.MigrateAsync` is public API (static would be a breaking
+# change) and making the private `Apply*Async` helpers static trips SA1204 (static members first) and reorders ~600 lines.
+dotnet_diagnostic.CA1822.severity = suggestion
+
+# CA1716 / CA1711 / CA1068 — rename a public member, type or parameter (`Get`, `OnExecutingAsync(..., next)`,
+# `KafkaConsumerDelegate`, a parameter order). Suggestion: each is a public API change, which needs a major version.
+dotnet_diagnostic.CA1716.severity = suggestion
+dotnet_diagnostic.CA1711.severity = suggestion
+dotnet_diagnostic.CA1068.severity = suggestion
+
 # ── Meziantou.Analyzer ────────────────────────────────────────────────────────
 
 # MA0051 — Method is too long.
@@ -137,8 +168,8 @@ dotnet_diagnostic.MA0016.severity = suggestion
 # Sometimes we group small related interfaces in one file.
 dotnet_diagnostic.MA0048.severity = suggestion
 
-# Suppress MA0011 (IFormatProvider) and documentation for Dashboard UI
-[src/NexJob.Dashboard*/**/*.cs]
+# Suppress MA0011 (IFormatProvider) and documentation for Dashboard UI (qKafka.Dashboard, Phase 4)
+[src/qKafka.Dashboard/**/*.cs]
 dotnet_diagnostic.MA0011.severity = none
 dotnet_diagnostic.SA1600.severity = none
 dotnet_diagnostic.SA1601.severity = none
@@ -148,20 +179,26 @@ dotnet_diagnostic.SA1201.severity = none
 dotnet_diagnostic.SA1202.severity = none
 dotnet_diagnostic.SA1204.severity = none
 
-# Suppress documentation rules for internal storage rows/documents
-[src/NexJob.*/{JobRow,RecurringJobRow,JobDocument,RecurringJobDocument,ServerDocument,ExecutionLogEntry,SchemaSQL,SchemaMigration,SqlServerSchemaSql}.cs]
-dotnet_diagnostic.SA1600.severity = none
-dotnet_diagnostic.SA1601.severity = none
-dotnet_diagnostic.SA1602.severity = none
-
-# Suppress MA0004 (ConfigureAwait) for Postgres due to type conflicts with await using and Dapper
-[src/NexJob.Postgres/**/*.cs]
-dotnet_diagnostic.MA0004.severity = none
-
-# ── Test project overrides ────────────────────────────────────────────────────
 # Tests have different style requirements: readability > formality.
 # StyleCop and async result rules are suppressed; Sonar rules remain.
 [tests/**/*.cs]
+# CA1707: test names follow Method_Scenario_Expected.
+dotnet_diagnostic.CA1707.severity = none
+# CA2201: tests throw a plain Exception on purpose to prove how the code handles an arbitrary failure.
+dotnet_diagnostic.CA2201.severity = none
+# CA1001: xunit test classes release their fields in IAsyncLifetime / IDisposable hooks the analyzer does not follow.
+dotnet_diagnostic.CA1001.severity = none
+# CA2016 / CA2012 / CA1806: tests ignore a token, read a ValueTask or build an object without using it on purpose,
+# to prove behaviour (a consumer that ignores cancellation, a constructor that throws).
+dotnet_diagnostic.CA2016.severity = none
+dotnet_diagnostic.CA2012.severity = none
+dotnet_diagnostic.CA1806.severity = none
+# CA2263 / CA1826 / CA1860 / CA1861 / CA1822 / CA1000: performance and API-shape hints that do not matter in test code.
+dotnet_diagnostic.CA2263.severity = none
+dotnet_diagnostic.CA1826.severity = none
+dotnet_diagnostic.CA1860.severity = none
+dotnet_diagnostic.CA1861.severity = none
+dotnet_diagnostic.CA1000.severity = none
 dotnet_diagnostic.SA0001.severity = none
 dotnet_diagnostic.SA1402.severity = none
 dotnet_diagnostic.MA0004.severity = none
@@ -178,6 +215,10 @@ dotnet_diagnostic.SA1202.severity = none
 dotnet_diagnostic.SA1204.severity = none
 
 [benchmarks/**/*.cs]
+# CA1707: benchmark method names are the labels of the published tables.
+dotnet_diagnostic.CA1707.severity = none
+# CA1001: the BenchmarkDotNet lifecycle ([GlobalCleanup]) releases the fields, not IDisposable.
+dotnet_diagnostic.CA1001.severity = none
 dotnet_diagnostic.SA0001.severity = none
 dotnet_diagnostic.SA1402.severity = none
 dotnet_diagnostic.MA0004.severity = none
@@ -191,55 +232,6 @@ dotnet_diagnostic.SA1602.severity = none
 dotnet_diagnostic.SA1201.severity = none
 dotnet_diagnostic.SA1202.severity = none
 dotnet_diagnostic.SA1204.severity = none
-
-[src/NexJob.Dashboard.Standalone/**/*.cs]
-dotnet_diagnostic.MA0004.severity = none
-
-[src/NexJob.Dashboard.Standalone/*.cs]
-dotnet_diagnostic.MA0004.severity = none
-
-[samples/**/*.cs]
-dotnet_diagnostic.SA0001.severity = none
-dotnet_diagnostic.SA1402.severity = none
-dotnet_diagnostic.MA0004.severity = none
-dotnet_diagnostic.MA0006.severity = none
-dotnet_diagnostic.MA0002.severity = none
-dotnet_diagnostic.MA0011.severity = none
-dotnet_diagnostic.MA0074.severity = none
-dotnet_diagnostic.MA0134.severity = none
-dotnet_diagnostic.MA0047.severity = none
-dotnet_diagnostic.RS0030.severity = none
-dotnet_diagnostic.SCS0005.severity = none
-dotnet_diagnostic.SA1200.severity = none
-dotnet_diagnostic.SA1201.severity = none
-dotnet_diagnostic.SA1202.severity = none
-dotnet_diagnostic.SA1204.severity = none
-dotnet_diagnostic.SA1210.severity = none
-dotnet_diagnostic.SA1309.severity = none
-dotnet_diagnostic.SA1402.severity = none
-dotnet_diagnostic.SA1503.severity = none
-dotnet_diagnostic.SA1512.severity = none
-dotnet_diagnostic.SA1515.severity = none
-dotnet_diagnostic.SA1516.severity = none
-dotnet_diagnostic.SA1519.severity = none
-dotnet_diagnostic.SA1600.severity = none
-dotnet_diagnostic.SA1601.severity = none
-dotnet_diagnostic.SA1602.severity = none
-dotnet_diagnostic.SA1611.severity = suggestion
-dotnet_diagnostic.SA1615.severity = none
-dotnet_diagnostic.SA1623.severity = none
-dotnet_diagnostic.SA1633.severity = none
-dotnet_diagnostic.SA1642.severity = none
-
-# ── Sample project overrides ──────────────────────────────────────────────────
-# Program.cs uses top-level statements; types at the end are intentionally in
-# the global namespace and have no explicit access modifier by design.
-# Job files co-locate the input record with the job class for readability in demos.
-[samples/**/*.cs]
-dotnet_diagnostic.S3903.severity = none
-dotnet_diagnostic.SA1400.severity = none
-dotnet_diagnostic.SA1402.severity = none
-dotnet_diagnostic.SA1649.severity = none
 
 [*.{json,yaml,yml}]
 indent_size = 2

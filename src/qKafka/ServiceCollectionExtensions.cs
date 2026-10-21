@@ -18,13 +18,14 @@ public static class ServiceCollectionExtensions
     /// </summary>
     /// <param name="services">The service collection.</param>
     /// <param name="configure">The configuration delegate.</param>
-    /// <returns>The service collection.</returns>
+    /// <returns>The same service collection, to allow call chaining.</returns>
     public static IServiceCollection AddqKafka(this IServiceCollection services, Action<QKafkaOptions> configure)
     {
         if (services == null)
         {
             throw new ArgumentNullException(nameof(services));
         }
+
         if (configure == null)
         {
             throw new ArgumentNullException(nameof(configure));
@@ -45,13 +46,14 @@ public static class ServiceCollectionExtensions
     /// </summary>
     /// <param name="services">The service collection.</param>
     /// <param name="assemblies">The assemblies to scan.</param>
-    /// <returns>The service collection.</returns>
+    /// <returns>The same service collection, to allow call chaining.</returns>
     public static IServiceCollection AddqKafkaConsumers(this IServiceCollection services, params Assembly[] assemblies)
     {
         if (services == null)
         {
             throw new ArgumentNullException(nameof(services));
         }
+
         if (assemblies == null || assemblies.Length == 0)
         {
             throw new ArgumentNullException(nameof(assemblies));
@@ -67,7 +69,7 @@ public static class ServiceCollectionExtensions
                 {
                     var consumerInterface = FindKafkaConsumerInterface(type);
                     if (consumerInterface != null)
-                      {
+                    {
                         var attribute = type.GetCustomAttribute<KafkaConsumerAttribute>();
                         if (attribute != null)
                         {
@@ -109,6 +111,7 @@ public static class ServiceCollectionExtensions
                 return iface;
             }
         }
+
         return null;
     }
 }

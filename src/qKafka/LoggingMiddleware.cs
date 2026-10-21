@@ -28,6 +28,7 @@ public sealed class LoggingMiddleware : IKafkaConsumerMiddleware
         {
             throw new ArgumentNullException(nameof(context));
         }
+
         if (next == null)
         {
             throw new ArgumentNullException(nameof(next));
@@ -53,11 +54,13 @@ public sealed class LoggingMiddleware : IKafkaConsumerMiddleware
             {
                 await next().ConfigureAwait(false);
             }
+            #pragma warning disable S2139 // log with context here, rethrow so the caller decides (retry, DLT, no offset commit)
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error processing message. Partition: {Partition}, Offset: {Offset}", context.Partition, context.Offset);
                 throw;
             }
+            #pragma warning restore S2139
         }
     }
 }

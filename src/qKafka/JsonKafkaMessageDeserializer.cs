@@ -16,6 +16,7 @@ public sealed class JsonKafkaMessageDeserializer : IKafkaMessageDeserializer
         {
             throw new ArgumentNullException(nameof(data));
         }
+
         if (targetType == null)
         {
             throw new ArgumentNullException(nameof(targetType));
@@ -27,6 +28,7 @@ public sealed class JsonKafkaMessageDeserializer : IKafkaMessageDeserializer
         {
             throw new JsonException($"Deserialized object was null for type {targetType.FullName}");
         }
+
         return result;
     }
 }

@@ -120,11 +120,13 @@ public sealed class DltPublisher : IDltPublisher, IDisposable
         {
             await _producer.ProduceAsync(dltTopic, message, cancellationToken).ConfigureAwait(false);
         }
+        #pragma warning disable S2139 // log with context here, rethrow so the caller decides (retry, DLT, no offset commit)
         catch (ProduceException<byte[], byte[]> ex)
         {
             _logger.LogError(ex, "Failed to publish message to Dead Letter Topic '{DltTopic}'", dltTopic);
             throw;
         }
+        #pragma warning restore S2139
     }
 
     /// <inheritdoc/>

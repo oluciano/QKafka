@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Confluent.Kafka;
+using Confluent.Kafka.Admin;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -71,12 +72,12 @@ internal sealed class KafkaConsumerLoop : BackgroundService
             typeof(ExecutionMiddleware<,>).MakeGenericType(_registration.ConsumerType, _registration.MessageType));
         builder.UseMiddleware(execMiddleware);
 
-        var pipelineExecutor = builder.Build(async context => await Task.CompletedTask);
+        var pipelineExecutor = builder.Build(_ => Task.CompletedTask);
 
         var workers = new PartitionWorker[concurrencyLimit];
         for (int i = 0; i < concurrencyLimit; i++)
         {
-            workers[i] = new PartitionWorker(dispatcher.Channels[i].Reader, pipelineExecutor, _serviceProvider);
+            workers[i] = new PartitionWorker(dispatcher.Channels[i].Reader, new Func<IKafkaContext, Task>(pipelineExecutor), _serviceProvider);
         }
 
         // 4. Build and subscribe consumer
@@ -105,6 +106,7 @@ internal sealed class KafkaConsumerLoop : BackgroundService
                     {
                         shouldPause = true;
                     }
+
                     if (count > 20)
                     {
                         shouldResume = false;
@@ -193,6 +195,7 @@ internal sealed class KafkaConsumerLoop : BackgroundService
 
     private async Task AutoProvisionTopicAsync(CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         if (string.IsNullOrEmpty(_options.BootstrapServers))
         {
             return;
@@ -311,7 +314,7 @@ internal sealed class KafkaConsumerLoop : BackgroundService
                         -1,
                         -1,
                         string.Empty,
-                        new Dictionary<string, byte[]>(),
+                        new Dictionary<string, byte[]>(StringComparer.Ordinal),
                         Array.Empty<byte>(),
                         scope.ServiceProvider,
                         CancellationToken.None);
@@ -345,7 +348,7 @@ internal sealed class KafkaConsumerLoop : BackgroundService
                         -1,
                         -1,
                         string.Empty,
-                        new Dictionary<string, byte[]>(),
+                        new Dictionary<string, byte[]>(StringComparer.Ordinal),
                         Array.Empty<byte>(),
                         scope.ServiceProvider,
                         CancellationToken.None);

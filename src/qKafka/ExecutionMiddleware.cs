@@ -33,6 +33,7 @@ public sealed class ExecutionMiddleware<TConsumer, TMessage> : IKafkaConsumerMid
         {
             throw new ArgumentNullException(nameof(context));
         }
+
         if (next == null)
         {
             throw new ArgumentNullException(nameof(next));

@@ -27,6 +27,7 @@ public sealed class ScopeMiddleware : IKafkaConsumerMiddleware
         {
             throw new ArgumentNullException(nameof(context));
         }
+
         if (next == null)
         {
             throw new ArgumentNullException(nameof(next));
