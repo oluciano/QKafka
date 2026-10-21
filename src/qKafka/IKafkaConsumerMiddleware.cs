@@ -6,7 +6,7 @@ namespace QKafka;
 /// <summary>
 /// Defines a middleware filter in the qKafka consumer execution pipeline.
 /// </summary>
-public interface IKafkaConsumerMiddleware
+internal interface IKafkaConsumerMiddleware
 {
     /// <summary>
     /// Invokes the middleware logic.

@@ -7,7 +7,7 @@ namespace QKafka;
 /// <summary>
 /// A default implementation of <see cref="IKafkaMessageDeserializer"/> using System.Text.Json.
 /// </summary>
-public sealed class JsonKafkaMessageDeserializer : IKafkaMessageDeserializer
+internal sealed class JsonKafkaMessageDeserializer : IKafkaMessageDeserializer
 {
     /// <inheritdoc/>
     public object Deserialize(byte[] data, Type targetType)

@@ -8,7 +8,7 @@ namespace QKafka;
 /// <summary>
 /// A middleware that opens a logging scope for the current message.
 /// </summary>
-public sealed class LoggingMiddleware : IKafkaConsumerMiddleware
+internal sealed class LoggingMiddleware : IKafkaConsumerMiddleware
 {
     private readonly ILogger<LoggingMiddleware> _logger;
 

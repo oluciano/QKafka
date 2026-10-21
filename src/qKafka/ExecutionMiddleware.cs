@@ -8,7 +8,7 @@ namespace QKafka;
 /// </summary>
 /// <typeparam name="TConsumer">The type of the consumer class.</typeparam>
 /// <typeparam name="TMessage">The type of the message.</typeparam>
-public sealed class ExecutionMiddleware<TConsumer, TMessage> : IKafkaConsumerMiddleware
+internal sealed class ExecutionMiddleware<TConsumer, TMessage> : IKafkaConsumerMiddleware
     where TConsumer : class, IKafkaConsumer<TMessage>
     where TMessage : class
 {

@@ -7,7 +7,7 @@ namespace QKafka;
 /// <summary>
 /// Builds a pipeline of middlewares for message consumption.
 /// </summary>
-public sealed class KafkaPipelineBuilder
+internal sealed class KafkaPipelineBuilder
 {
     private readonly List<Func<KafkaConsumerDelegate, KafkaConsumerDelegate>> _components = new();
 

@@ -7,7 +7,7 @@ namespace QKafka;
 /// <summary>
 /// Defines hooks to react to partition assignments and rebalances.
 /// </summary>
-public interface IPartitionAssignmentListener
+internal interface IPartitionAssignmentListener
 {
     /// <summary>
     /// Triggered when partitions are assigned to this consumer group instance.

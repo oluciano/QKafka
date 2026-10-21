@@ -7,4 +7,4 @@ namespace QKafka;
 /// </summary>
 /// <param name="context">The execution context.</param>
 /// <returns>A task representing the asynchronous operation.</returns>
-public delegate Task KafkaConsumerDelegate(IKafkaContext context);
+internal delegate Task KafkaConsumerDelegate(IKafkaContext context);

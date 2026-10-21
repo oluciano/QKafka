@@ -8,7 +8,7 @@ namespace QKafka;
 /// <summary>
 /// Defines a publisher that routes failed messages to a Dead Letter Topic.
 /// </summary>
-public interface IDltPublisher
+internal interface IDltPublisher
 {
     /// <summary>
     /// Routes a failed message to its Dead Letter Topic with enriched diagnostic headers.

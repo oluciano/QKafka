@@ -9,7 +9,7 @@ namespace QKafka;
 /// <summary>
 /// Execution context for a message being consumed.
 /// </summary>
-public sealed class KafkaContext : IKafkaContext
+internal sealed class KafkaContext : IKafkaContext
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="KafkaContext"/> class.

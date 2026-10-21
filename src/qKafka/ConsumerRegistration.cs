@@ -5,7 +5,7 @@ namespace QKafka;
 /// <summary>
 /// Represents a registered consumer with its configuration metadata.
 /// </summary>
-public sealed class ConsumerRegistration
+internal sealed class ConsumerRegistration
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="ConsumerRegistration"/> class.

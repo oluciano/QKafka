@@ -7,7 +7,7 @@ namespace QKafka;
 /// <summary>
 /// A pipeline middleware that handles retries with exponential backoff and routes to Dead Letter Topic on failure.
 /// </summary>
-public sealed class RetryMiddleware : IKafkaConsumerMiddleware
+internal sealed class RetryMiddleware : IKafkaConsumerMiddleware
 {
     private readonly RetryOptions _options;
     private readonly IDltPublisher _dltPublisher;

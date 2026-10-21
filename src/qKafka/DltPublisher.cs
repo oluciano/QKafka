@@ -10,7 +10,7 @@ namespace QKafka;
 /// <summary>
 /// Default implementation of <see cref="IDltPublisher"/> using a Kafka producer.
 /// </summary>
-public sealed class DltPublisher : IDltPublisher, IDisposable
+internal sealed class DltPublisher : IDltPublisher, IDisposable
 {
     private readonly IProducer<byte[], byte[]>? _producer;
     private readonly ILogger<DltPublisher> _logger;

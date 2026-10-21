@@ -7,7 +7,7 @@ namespace QKafka;
 /// <summary>
 /// A middleware that creates a Dependency Injection scope for each message execution.
 /// </summary>
-public sealed class ScopeMiddleware : IKafkaConsumerMiddleware
+internal sealed class ScopeMiddleware : IKafkaConsumerMiddleware
 {
     private readonly IServiceProvider _serviceProvider;
 

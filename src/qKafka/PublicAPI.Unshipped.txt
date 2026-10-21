@@ -1,0 +1,71 @@
+#nullable enable
+QKafka.ConsumerOptions
+QKafka.ConsumerOptions.AutoOffsetReset.get -> string?
+QKafka.ConsumerOptions.AutoOffsetReset.set -> void
+QKafka.ConsumerOptions.ConcurrencyLimit.get -> int
+QKafka.ConsumerOptions.ConcurrencyLimit.set -> void
+QKafka.ConsumerOptions.ConsumerOptions() -> void
+QKafka.ConsumerOptions.Retry.get -> QKafka.RetryOptions!
+QKafka.ConsumerOptions.Retry.set -> void
+QKafka.DltReason
+QKafka.DltReason.MaxRetriesExceeded = 1 -> QKafka.DltReason
+QKafka.DltReason.PoisonPill = 0 -> QKafka.DltReason
+QKafka.IKafkaConsumer<TMessage>
+QKafka.IKafkaConsumer<TMessage>.ConsumeAsync(TMessage! message, QKafka.IKafkaContext! context) -> System.Threading.Tasks.Task!
+QKafka.IKafkaContext
+QKafka.IKafkaContext.CancellationToken.get -> System.Threading.CancellationToken
+QKafka.IKafkaContext.Headers.get -> System.Collections.Generic.IReadOnlyDictionary<string!, byte[]!>!
+QKafka.IKafkaContext.Key.get -> string!
+QKafka.IKafkaContext.Offset.get -> long
+QKafka.IKafkaContext.Partition.get -> int
+QKafka.IKafkaContext.Payload.get -> byte[]!
+QKafka.IKafkaContext.PublishAsync<TMessage>(TMessage! message, string? key = null) -> System.Threading.Tasks.Task!
+QKafka.IKafkaContext.RequestServices.get -> System.IServiceProvider!
+QKafka.IKafkaMessageDeserializer
+QKafka.IKafkaMessageDeserializer.Deserialize(byte[]! data, System.Type! targetType) -> object!
+QKafka.KafkaConsumerAttribute
+QKafka.KafkaConsumerAttribute.GroupId.get -> string?
+QKafka.KafkaConsumerAttribute.GroupId.set -> void
+QKafka.KafkaConsumerAttribute.KafkaConsumerAttribute(string! topic) -> void
+QKafka.KafkaConsumerAttribute.Topic.get -> string!
+QKafka.QKafkaOptions
+QKafka.QKafkaOptions.BootstrapServers.get -> string!
+QKafka.QKafkaOptions.BootstrapServers.set -> void
+QKafka.QKafkaOptions.Consumers.get -> System.Collections.Generic.Dictionary<string!, QKafka.ConsumerOptions!>!
+QKafka.QKafkaOptions.QKafkaOptions() -> void
+QKafka.QKafkaOptions.Retry.get -> QKafka.RetryOptions!
+QKafka.QKafkaOptions.Retry.set -> void
+QKafka.QKafkaOptions.SaslMechanism.get -> string?
+QKafka.QKafkaOptions.SaslMechanism.set -> void
+QKafka.QKafkaOptions.SaslPassword.get -> string?
+QKafka.QKafkaOptions.SaslPassword.set -> void
+QKafka.QKafkaOptions.SaslUsername.get -> string?
+QKafka.QKafkaOptions.SaslUsername.set -> void
+QKafka.QKafkaOptions.SecurityProtocol.get -> string?
+QKafka.QKafkaOptions.SecurityProtocol.set -> void
+QKafka.RetryOptions
+QKafka.RetryOptions.BackoffMultiplier.get -> double
+QKafka.RetryOptions.BackoffMultiplier.set -> void
+QKafka.RetryOptions.InitialDelayMs.get -> int
+QKafka.RetryOptions.InitialDelayMs.set -> void
+QKafka.RetryOptions.MaxDelayMs.get -> int
+QKafka.RetryOptions.MaxDelayMs.set -> void
+QKafka.RetryOptions.MaxRetryAttempts.get -> int
+QKafka.RetryOptions.MaxRetryAttempts.set -> void
+QKafka.RetryOptions.RetryOptions() -> void
+QKafka.Sagas.IHandleSaga<TMessage>
+QKafka.Sagas.IHandleSaga<TMessage>.HandleAsync(TMessage! message, QKafka.Sagas.ISagaContext! context) -> System.Threading.Tasks.Task!
+QKafka.Sagas.ISagaContext
+QKafka.Sagas.ISagaContext.Complete() -> void
+QKafka.Sagas.ISagaContext.RegisterCompensation<TMessage>(TMessage! message) -> void
+QKafka.Sagas.IStartSaga<TMessage>
+QKafka.Sagas.IStartSaga<TMessage>.HandleAsync(TMessage! message, QKafka.Sagas.ISagaContext! context) -> System.Threading.Tasks.Task!
+QKafka.Sagas.Saga<TSagaState>
+QKafka.Sagas.Saga<TSagaState>.CorrelationId.get -> System.Guid
+QKafka.Sagas.Saga<TSagaState>.CorrelationId.set -> void
+QKafka.Sagas.Saga<TSagaState>.Saga() -> void
+QKafka.Sagas.Saga<TSagaState>.State.get -> TSagaState!
+QKafka.Sagas.Saga<TSagaState>.State.set -> void
+QKafka.ServiceCollectionExtensions
+static QKafka.ServiceCollectionExtensions.AddqKafka(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, System.Action<QKafka.QKafkaOptions!>! configure) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
+static QKafka.ServiceCollectionExtensions.AddqKafkaConsumers(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, params System.Reflection.Assembly![]! assemblies) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!

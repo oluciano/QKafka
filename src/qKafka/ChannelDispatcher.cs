@@ -10,7 +10,7 @@ namespace QKafka;
 /// <summary>
 /// Dispatches consumed messages to bounded partition channels based on Partition Key hashing.
 /// </summary>
-public sealed class ChannelDispatcher
+internal sealed class ChannelDispatcher
 {
     private readonly Channel<ConsumeResult<byte[], byte[]>>[] _channels;
     private readonly int _maxConcurrency;
