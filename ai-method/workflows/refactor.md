@@ -38,6 +38,6 @@ A refactor **MUST NOT** alter observable behavior or public API contracts:
 ## 5. Automated Verification & Exit Criteria
 - [ ] All existing unit, integration, and reliability tests pass 100% unmodified
 - [ ] Test contract self-audit verified (`git diff main -- tests` shows no dropped assertions)
-- [ ] Zero compiler warnings in Release build (`TreatWarningsAsErrors = true`) on both `net8.0` and `net10.0`
+- [ ] Zero compiler warnings in Release build (`TreatWarningsAsErrors = true`) on `net10.0`
 - [ ] `dotnet format --verify-no-changes` passes cleanly
 - [ ] Public API surface completely unchanged

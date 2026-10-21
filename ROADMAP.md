@@ -1,6 +1,6 @@
 # ROADMAP — qKafka Action Plan
 
-This document serves as the strategic guide and action plan for the development of **qKafka**. The main goal is to build a .NET 8+ alternative to MassTransit for Kafka that is **free (MIT licensed)**, **Kafka-First** (respecting the broker's native architecture), and **infinitely simpler to configure and debug**.
+This document serves as the strategic guide and action plan for the development of **qKafka**. The main goal is to build a .NET 10+ alternative to MassTransit for Kafka that is **free (MIT licensed)**, **Kafka-First** (respecting the broker's native architecture), and **infinitely simpler to configure and debug**.
 
 ---
 
@@ -126,7 +126,7 @@ A new package is only justified by a heavy or incompatible dependency (e.g. Sche
 - [ ] Multi-provider storage with one **shared contract test suite** (InMemory, PostgreSQL, SQL Server, later Redis/MongoDB).
 - [ ] Multi-service guide: queue/consumer-group isolation by default per application; web app + worker split.
 - [ ] Roslyn **analyzers** for misuse (blocking calls in handlers, missing correlation, etc.).
-- [ ] Target `net8.0` + `net10.0`; documented runtime-drop policy.
+- [ ] Target `net10.0` only (LTS). Add `net8.0` to `TargetFrameworks` only on real demand; document the runtime-drop policy.
 
 ### Quality, Testing & Docs
 - [ ] **"How we test" page** with honest gaps; reliability scenarios with multiple nodes on one DB; killed-process test; upgrade test (storage from previous version opens with the new one).

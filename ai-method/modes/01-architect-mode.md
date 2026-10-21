@@ -9,7 +9,7 @@
 
 1. **Analyze the request** — understand the problem, constraints, and operational context. Locate the spec in `specs/NN-*.md` (create it first if missing).
 2. **Check architecture & invariants** — verify alignment with `ARCHITECTURE.md`, `ROADMAP.md` and `ai-method/core/00-foundation-minimal.md`.
-3. **Multi-Targeting Awareness** — ensure the design compiles for every target framework in `Directory.Build.props`. Any framework-exclusive feature must be conditionally compiled (`#if NET10_0_OR_GREATER`) without breaking the `net8.0` baseline.
+3. **Target Framework Awareness** — the project targets `net10.0` only (see `Directory.Build.props`). If `net8.0` is ever added back, framework-exclusive features must be conditionally compiled (`#if NET10_0_OR_GREATER`) without breaking the older baseline.
 4. **Design the solution** — specify classes, methods, execution flow, database interactions, and explicit boundaries.
 5. **Formulate 3N Testing Matrix** — define mandatory N1 (positive), N2 (negative), and N3 (invalid/boundary) test scenarios upfront.
 6. **Validate invariants & risks** — ensure compliance with foundation rules and flag architectural risks.

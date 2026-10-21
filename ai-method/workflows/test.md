@@ -27,7 +27,7 @@ Every feature or bug fix produces at least 3 tests:
 - **No Fixed Sleeps:** `Task.Delay(50)` to wait for state is banned. Poll observed state (`TestWait.UntilAsync`), use `TaskCompletionSource` or an observed signal.
 - **One Canonical Test File per Class:** `Foo` → `FooTests.cs`. No `FooHardeningTests.cs` twins.
 - **Existing tests are contracts:** never weaken, invert or delete an assertion. Moving/merging into a `[Theory]` and deleting a proven duplicate are allowed.
-- **Dual-Target:** tests pass on `net8.0` and `net10.0`.
+- **Dual-Target:** tests pass on `net10.0`.
 - **Real behavior over mocks:** fake the broker boundary (`IKafkaConsumer`, producer), not the code under test.
 
 > **N2 case study: Outbox publisher concurrency.** A unit test can verify the catch block for a DB error. A *distributed reliability test* is still required to prove that with N publisher instances competing, each outbox row is claimed by exactly one (`SKIP LOCKED`).
@@ -99,7 +99,7 @@ public sealed class KafkaConsumerLoopTests
 - [ ] Deterministic, no fixed sleeps
 - [ ] Real behavior (fakes only at the broker/DB boundary)
 - [ ] 3N complete; coverage floor held
-- [ ] Pass on `net8.0` and `net10.0`
+- [ ] Pass on `net10.0`
 - [ ] Zero warnings, StyleCop compliant
 
 ## Exit Criteria

@@ -18,7 +18,7 @@ Then load what the task needs:
 
 ## Project
 
-**qKafka** is a modern, lightweight, and developer-friendly messaging and workflow orchestration library for Apache Kafka in .NET 8+.
+**qKafka** is a modern, lightweight, and developer-friendly messaging and workflow orchestration library for Apache Kafka in .NET 10+.
 MIT licensed. Alternative to MassTransit — Kafka-first, rebalance-protected, outbox/inbox native, OTel-native.
 
 ---

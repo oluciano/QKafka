@@ -33,7 +33,7 @@
 - Docker via Testcontainers: Apache Kafka (KRaft), PostgreSQL 16, SQL Server 2022.
 - xUnit, full isolation per fixture (unique topic + consumer group per test).
 - Fault injection: a proxy/wrapper at the broker and DB boundary (e.g. stop container, `ToxiProxy`-style, throwing `IOutboxStore` decorator) — never `Task.Delay` guesses.
-- Dual target `net8.0` and `net10.0`.
+- Single target `net10.0`.
 
 **Location:** `tests/qKafka.ReliabilityTests/` (create when the first scenario lands).
 
@@ -70,5 +70,5 @@ dotnet test tests/qKafka.ReliabilityTests -c Release
 - [ ] Every touched row of the failure matrix has a passing test
 - [ ] Tests deterministic (3 consecutive green runs)
 - [ ] Proof uses durable state, not in-memory flags
-- [ ] Passes on `net8.0` and `net10.0`
+- [ ] Passes on `net10.0`
 - [ ] Known gaps (what is NOT tested) written down in the PR / docs

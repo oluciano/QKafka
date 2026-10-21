@@ -1,6 +1,6 @@
 # Step-by-Step Usage Guide: Implementing qKafka
 
-This guide demonstrates how to integrate and use **qKafka** in a real-world .NET 8+ Web API project, covering everything from initial installation to writing consumers, publishing via Outbox, orchestrating workflows with Sagas, and writing unit tests.
+This guide demonstrates how to integrate and use **qKafka** in a real-world .NET 10+ Web API project, covering everything from initial installation to writing consumers, publishing via Outbox, orchestrating workflows with Sagas, and writing unit tests.
 
 ---
 

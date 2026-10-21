@@ -18,7 +18,7 @@
 - Respect `core/00-foundation-minimal.md`: storage is the single source of truth; the poll loop never blocks; order per partition key; atomic saga state + outbox commit.
 - No unnecessary DTOs or leaky Confluent types in the public API (`IKafkaContext`, `IKafkaConsumer<T>`, `IKafkaPublisher`).
 - **Public API evolution:** add new overloads; never add optional parameters to existing interface methods.
-- **Multi-targeting:** design for `net8.0` and `net10.0`; `#if NET10_0_OR_GREATER` only when necessary.
+- **Target framework:** design for `net10.0` only; add `net8.0` back only on real demand.
 - Touching the consume path (`KafkaConsumerLoop`, `ChannelDispatcher`, `PartitionWorker`, `KafkaPipelineBuilder`) requires explicit architectural approval and the `reliability` workflow.
 
 ---
@@ -39,7 +39,7 @@ Write the tests FIRST:
 - Implement ONLY what the spec's Definition of Done says.
 - `sealed` by default; XML docs (`///`) on public APIs.
 - async/await only, propagate `CancellationToken`, `.ConfigureAwait(false)` in `src/qKafka*`.
-- Zero warnings (`TreatWarningsAsErrors = true`) on `net8.0` and `net10.0`.
+- Zero warnings (`TreatWarningsAsErrors = true`) on `net10.0`.
 
 ---
 
@@ -57,7 +57,7 @@ Write the tests FIRST:
 - [ ] Spec exists and the DoD is met
 - [ ] Red-first proof committed
 - [ ] 3N matrix satisfied, no fixed sleeps
-- [ ] Zero warnings in Release on `net8.0` and `net10.0`
+- [ ] Zero warnings in Release on `net10.0`
 - [ ] `dotnet format` verified
 - [ ] All tests pass; no existing test modified without approval
 - [ ] `CHANGELOG.md` updated under `[Unreleased]`

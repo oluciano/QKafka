@@ -8,7 +8,7 @@ description: >-
 
 # qKafka Task Cycle
 
-Workflow for **qKafka** (.NET 8+). Modes live in `ai-method/modes/`, workflows in `ai-method/workflows/`, invariants in `ai-method/core/00-foundation-minimal.md`.
+Workflow for **qKafka** (.NET 10+). Modes live in `ai-method/modes/`, workflows in `ai-method/workflows/`, invariants in `ai-method/core/00-foundation-minimal.md`.
 
 ```
 Phase 0 Grooming ► Phase 1 Pre-flight ► Phase 2 3N tests ► Phase 3 Implementation

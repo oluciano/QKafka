@@ -84,7 +84,7 @@ Verify no broken relative links in `README.md`, `ROADMAP.md`, `docs/` and `specs
 
 ## 7. Exit Criteria
 
-- [ ] All code snippets compile and reflect modern C# (.NET 8 and .NET 10)
+- [ ] All code snippets compile and reflect modern C# (.NET 10)
 - [ ] Bidirectional audit complete: no omitted changes, no ghost/duplicate entries
 - [ ] No repo-relative links in `CHANGELOG.md`
 - [ ] All dependency bumps listed under `### Dependencies`

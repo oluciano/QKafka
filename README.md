@@ -11,7 +11,7 @@
   ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝     ╚═╝  ╚═╝╚═╝  ╚═╝
 ```
 
-**Reliable, High-Performance, and Developer-Friendly Kafka for .NET 8+.**
+**Reliable, High-Performance, and Developer-Friendly Kafka for .NET 10+.**
 
 [![NuGet](https://img.shields.io/nuget/v/qKafka.svg?style=flat-square&color=512bd4&label=nuget)](https://www.nuget.org/packages/qKafka)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg?style=flat-square)](LICENSE)
@@ -24,7 +24,7 @@
 
 ## What is qKafka?
 
-**qKafka** is a modern, lightweight, and developer-friendly messaging and workflow orchestration library for Apache Kafka in .NET 8+.
+**qKafka** is a modern, lightweight, and developer-friendly messaging and workflow orchestration library for Apache Kafka in .NET 10+.
 It is built for teams who want the power of Kafka without the low-level boilerplate of the Confluent SDK or the commercial licensing and heavyweight abstractions of MassTransit.
 
 It treats Kafka as a **distributed append-only log**, not a queue, offering native partition handling, out-of-the-box Sagas (State Machines), and Transactional Outbox/Inbox patterns—all under a free, business-friendly **MIT License**.

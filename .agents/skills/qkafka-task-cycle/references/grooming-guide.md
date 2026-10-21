@@ -25,5 +25,5 @@ Questions to answer before writing a spec. Write the answers into `specs/NN-*.md
 
 ## Scope
 - Public API change? XML docs, README and `docs/` impact.
-- Multi-targeting (`net8.0`, `net10.0` if enabled in `Directory.Build.props`).
+- Target framework (`net10.0`, set in `Directory.Build.props`).
 - Which ROADMAP phase and checkbox does this close? Is it a patch (bug fix only) or minor (new feature)?
