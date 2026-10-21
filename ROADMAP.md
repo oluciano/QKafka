@@ -19,6 +19,19 @@ qKafka solves the complexities of Apache Kafka in .NET by combining the robustne
 
 ---
 
+## 📦 Package Strategy
+Deliberately small: **one main package**, plus two optional ones that exist only to avoid forcing heavy dependencies on everyone.
+
+| Package | Contents |
+|---|---|
+| `qKafka` | Consumer/producer engine, pipeline, retry, DLT, Outbox/Inbox/Saga logic + in-memory stores, test harness, OpenTelemetry (namespaces `QKafka.Outbox`, `QKafka.Sagas`, `QKafka.Testing`) |
+| `qKafka.EntityFrameworkCore` | PostgreSQL / SQL Server stores (keeps EF Core out of the main package) |
+| `qKafka.Dashboard` | ASP.NET Core dashboard (Phase 4; keeps the ASP.NET shared framework out of Worker Services) |
+
+A new package is only justified by a heavy or incompatible dependency (e.g. Schema Registry/Avro), never by a feature boundary.
+
+---
+
 ## 🛠️ Reference Architecture
 
 ```
@@ -77,6 +90,50 @@ qKafka solves the complexities of Apache Kafka in .NET by combining the robustne
 - [ ] Fluent assertions: `AssertConsumed<T>`, `AssertPublished<T>` with timeout support
 - [ ] In-memory outbox and saga state support
 - [ ] DLT register assertions (`AssertRoutedToDlt<T>`)
+
+---
+
+## 💡 Ideas Imported from NexJob
+*Source: `~/git/NexJob` (v6.7.0 docs, CHANGELOG and open issues). NexJob has no ROADMAP of its own, so these are the proven patterns and open lessons worth porting. Each item should become a spec in `specs/` before implementation.*
+
+### Reliability & Delivery Semantics
+- [ ] **Delivery-guarantees doc**: one page stating the cost of each failure (crash, rebalance, shutdown, broker/DB outage) like NexJob's `delivery-guarantees.md`.
+- [ ] **Storage-outage resilience**: commit of a failed/succeeded message retried (3x with backoff); if exhausted, leave offset uncommitted and let rebalance/redelivery decide. Outbox publisher, Saga repo and Inbox must survive DB blips without ending the host.
+- [ ] **Startup retry with exponential backoff** (1s → 30s) for registration work (saga/consumer registration, outbox init) when DB is down at start; distinguish permanent config errors (never retried) from transient ones.
+- [ ] **Stale-entry guard**: after a rebalance/requeue, re-check state before executing (NexJob's Redis double-run bug, #647). Applies to Inbox + Saga state.
+- [ ] **Heartbeat/orphan recovery** for in-flight saga steps and outbox rows claimed by dead nodes.
+- [ ] **Execution timeout per handler** (`[ExecutionTimeout]`) and **deadlines** (message expires if not processed within N).
+- [ ] **Checkpoints** (`GetCheckpoint<TState>`) for long-running handlers, with a warning log when a checkpoint cannot be deserialized.
+
+### Protection & Flow Control
+- [ ] **Circuit breaker per consumer/topic**: pause consumption when a downstream dependency keeps failing (`pause()` the partitions, not the poll loop).
+- [ ] **`[Throttle]` per resource**, optionally cluster-wide (Redis) to cap concurrency against a shared dependency.
+- [ ] **Execution windows**: consume only inside configured time windows.
+- [ ] **Runtime control**: pause/resume consumers, requeue and delete DLT items, runtime settings persisted across restarts (`IRuntimeSettingsStore`).
+- [ ] **Idempotency policies** (`DuplicatePolicy`) on publish, in addition to Inbox.
+- [ ] **Handler filters** (`job-filters`) as a public extension point alongside the middleware pipeline.
+
+### Observability & Dashboard (Phase 4 inputs)
+- [ ] `Ctrl+K` global search, topology map (topic → consumer → saga → outbox), streaming logs via SSE, progress bars, themes.
+- [ ] **Alerts** when a message reaches DLT for good (webhook/Slack/email hook).
+- [ ] Health checks + OpenTelemetry package split (`qKafka.OpenTelemetry`).
+- [ ] **Dashboard security by default**: localhost-only standalone host, authorization handler required (or loud warning) in embedded mode, CSRF/Origin check on POST, security headers + CSP, encode all stored values, optional payload masking, `Cache-Control: no-store`, no third-party fonts. (NexJob issues #594, #595, #598, #629)
+- [ ] **Standalone dashboard host** for Worker Services without ASP.NET Core.
+- [ ] Opt-in **scenario playground** (burst load, failures) and a public live demo.
+
+### Integrations & Packaging
+- [ ] **Trigger/bridge with NexJob**: Kafka topic → NexJob job and NexJob outbox → Kafka (NexJob already references qKafka as companion). Security rule: the configured job type always wins over a message header (#630).
+- [ ] Multi-provider storage with one **shared contract test suite** (InMemory, PostgreSQL, SQL Server, later Redis/MongoDB).
+- [ ] Multi-service guide: queue/consumer-group isolation by default per application; web app + worker split.
+- [ ] Roslyn **analyzers** for misuse (blocking calls in handlers, missing correlation, etc.).
+- [ ] Target `net8.0` + `net10.0`; documented runtime-drop policy.
+
+### Quality, Testing & Docs
+- [ ] **"How we test" page** with honest gaps; reliability scenarios with multiple nodes on one DB; killed-process test; upgrade test (storage from previous version opens with the new one).
+- [ ] Benchmarks vs Confluent SDK / MassTransit (BenchmarkDotNet, allocation focus, reproducible, publish the caveats).
+- [ ] Docs: mental model, quickstart, best practices (Kubernetes), troubleshooting with exact log messages, FAQ, common scenarios, Hangfire/MassTransit-style migration page, maturity & API-stability statement, worker sizing / connection pool rule.
+- [ ] Supply-chain hygiene: OpenSSF Scorecard, CodeQL, pinned Actions, Dependabot rules, scheduled `dotnet list package --vulnerable`.
+- [ ] Rule justification test: every disabled analyzer rule in `.editorconfig` carries a reason, enforced by a test.
 
 ---
 
