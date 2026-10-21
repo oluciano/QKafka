@@ -34,7 +34,7 @@ internal sealed class PartitionWorker : IDisposable
         _pipelineExecutor = pipelineExecutor ?? throw new ArgumentNullException(nameof(pipelineExecutor));
         _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         _cts = new CancellationTokenSource();
-        _runningTask = Task.Run(() => RunLoopAsync(_cts.Token));
+        _runningTask = Task.Run(() => RunLoopAsync(_cts.Token), _cts.Token);
     }
 
     /// <summary>
