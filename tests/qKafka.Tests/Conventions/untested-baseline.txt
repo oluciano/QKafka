@@ -1,12 +1,5 @@
 # Production files with logic that still have no <path>/<Name>UnitTests.cs. This list only shrinks:
 # remove a line when its unit test is added (the build-time convention test fails if you forget).
-ConsumerOptions.cs
-ConsumerRegistration.cs
 DltPublisher.cs
-KafkaConsumerAttribute.cs
 KafkaConsumerLoop.cs
-KafkaPipelineBuilder.cs
 PartitionWorker.cs
-QKafkaOptions.cs
-RetryOptions.cs
-Sagas/Saga.cs
