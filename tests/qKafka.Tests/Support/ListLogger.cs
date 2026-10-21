@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 namespace QKafka.Tests.Support;
 
 /// <summary>An <see cref="ILogger{T}"/> that keeps every entry so tests can assert on levels and structured values.</summary>
+/// <typeparam name="T">The category type of the logger.</typeparam>
 internal sealed class ListLogger<T> : ILogger<T>
 {
     public List<(LogLevel Level, IReadOnlyList<KeyValuePair<string, object?>> State)> Entries { get; } = new();
