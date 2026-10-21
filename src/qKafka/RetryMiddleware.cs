@@ -76,13 +76,13 @@ public sealed class RetryMiddleware : IKafkaConsumerMiddleware
                             // Swallowing the exception so the offset is committed (since it's now in the DLT)
                             return;
                         }
-                        #pragma warning disable S2139 // log with context here, rethrow so the caller decides (retry, DLT, no offset commit)
+#pragma warning disable S2139 // log with context here, rethrow so the caller decides (retry, DLT, no offset commit)
                         catch (Exception dltEx)
                         {
                             _logger.LogError(dltEx, "Failed to publish message to Dead Letter Topic. Offset will not be committed.");
                             throw;
                         }
-                        #pragma warning restore S2139
+#pragma warning restore S2139
                     }
 
                     throw;
