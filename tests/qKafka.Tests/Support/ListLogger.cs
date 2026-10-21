@@ -8,8 +8,14 @@ internal sealed class ListLogger<T> : ILogger<T>
 {
     public List<(LogLevel Level, IReadOnlyList<KeyValuePair<string, object?>> State)> Entries { get; } = new();
 
+    public List<object> Scopes { get; } = new();
+
     public IDisposable? BeginScope<TState>(TState state)
-        where TState : notnull => null;
+        where TState : notnull
+    {
+        Scopes.Add(state);
+        return null;
+    }
 
     public bool IsEnabled(LogLevel logLevel) => true;
 

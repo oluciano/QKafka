@@ -20,14 +20,18 @@ internal static class TestKafka
             },
         };
 
-    public static KafkaContext Context(ConsumeResult<byte[], byte[]>? result, CancellationToken cancellationToken = default) =>
+    public static KafkaContext Context(
+        ConsumeResult<byte[], byte[]>? result,
+        CancellationToken cancellationToken = default,
+        IReadOnlyDictionary<string, byte[]>? headers = null,
+        IServiceProvider? services = null) =>
         new(
             result,
             result?.Partition.Value ?? 0,
             result?.Offset.Value ?? 0,
             result?.Message.Key is { } key ? Encoding.UTF8.GetString(key) : string.Empty,
-            new Dictionary<string, byte[]>(StringComparer.Ordinal),
+            headers ?? new Dictionary<string, byte[]>(StringComparer.Ordinal),
             result?.Message.Value ?? Array.Empty<byte>(),
-            new ServiceCollection().BuildServiceProvider(),
+            services ?? new ServiceCollection().BuildServiceProvider(),
             cancellationToken);
 }

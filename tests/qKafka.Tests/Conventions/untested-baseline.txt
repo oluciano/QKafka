@@ -3,16 +3,10 @@
 ConsumerOptions.cs
 ConsumerRegistration.cs
 DltPublisher.cs
-ExecutionMiddleware.cs
-JsonKafkaMessageDeserializer.cs
 KafkaConsumerAttribute.cs
 KafkaConsumerLoop.cs
-KafkaContext.cs
 KafkaPipelineBuilder.cs
-LoggingMiddleware.cs
 PartitionWorker.cs
 QKafkaOptions.cs
 RetryOptions.cs
 Sagas/Saga.cs
-ScopeMiddleware.cs
-ServiceCollectionExtensions.cs
