@@ -170,7 +170,7 @@ internal sealed class InboxFilter : IKafkaConsumerFilter
 
 ## 5. Clean Architecture & Modular Injections
 
-To prevent the API/Startup project from directly referencing the database DLLs or EF Core, the extension methods in `qKafka.Outbox` must be design-friendly for Class Libraries:
+To prevent the API/Startup project from directly referencing the database DLLs or EF Core, the extension methods in `qKafka.EntityFrameworkCore` must be design-friendly for Class Libraries:
 
 ### Optional Migrations Assembly Config
 The `AddEntityFrameworkOutbox<TContext>` will optionally accept configurations to support separate Migrations assemblies:

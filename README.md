@@ -99,12 +99,11 @@ public sealed class OrderPlacedConsumer : IKafkaConsumer<OrderPlaced>
 
 | Package | Status | Description |
 |---|---|---|
-| `qKafka` | Core consumer/producer engine, rebalance protection | Development |
-| `qKafka.Outbox` | Outbox/Inbox persistence contracts & implementation | Development |
-| `qKafka.Sagas` | Saga orchestrator, correlation, & state machine | Development |
-| `qKafka.Dashboard` | Integrated telemetry & lag explorer dashboard | Planned |
-| `qKafka.SchemaRegistry` | Avro / Protobuf schema registry integrations | Planned |
-| `qKafka.Testing` | In-Memory Kafka Test Harness for unit testing | Planned |
+| `qKafka` | Everything you need to start: consumer/producer engine, rebalance protection, Outbox/Inbox, Sagas, in-memory stores, test harness, OpenTelemetry | Development |
+| `qKafka.EntityFrameworkCore` | Durable Outbox/Inbox/Saga stores for PostgreSQL & SQL Server (EF Core) | Planned |
+| `qKafka.Dashboard` | Integrated telemetry & lag explorer dashboard (ASP.NET Core) | Planned |
+
+Outbox, Inbox, Sagas and the test harness are namespaces inside the single `qKafka` package (`QKafka.Outbox`, `QKafka.Sagas`, `QKafka.Testing`), so there is nothing extra to install until you need a database or the dashboard.
 
 ---
 

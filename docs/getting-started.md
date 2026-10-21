@@ -11,11 +11,14 @@ First, add the required packages to your projects.
 ```bash
 # Add to your API / Worker Project
 dotnet add package qKafka
-dotnet add package qKafka.Outbox
-dotnet add package qKafka.Sagas
 
-# Add to your Test Project
-dotnet add package qKafka.Testing
+# Durable Outbox/Inbox/Saga storage (PostgreSQL / SQL Server)
+dotnet add package qKafka.EntityFrameworkCore
+
+# Optional: dashboard (ASP.NET Core hosts)
+dotnet add package qKafka.Dashboard
+
+# Tests: the in-memory harness ships inside qKafka (namespace qKafka.Testing)
 ```
 
 ---

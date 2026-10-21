@@ -24,8 +24,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\qKafka\qKafka.csproj" />
-    <ProjectReference Include="..\..\src\qKafka.Sagas\qKafka.Sagas.csproj" />
-    <ProjectReference Include="..\..\src\qKafka.Outbox\qKafka.Outbox.csproj" />
   </ItemGroup>
 
 </Project>

@@ -28,12 +28,12 @@ injectable service.
 
 ### Two Publishing Modes
 
-**Direct Mode** (default when `qKafka.Outbox` is not registered):
+**Direct Mode** (default when the Outbox is not registered):
 Publishes directly to the Kafka broker. Fast, but not transactionally safe — if the
 database write succeeds and the broker is temporarily unavailable, the message is lost.
 Suitable for non-critical events or fire-and-forget scenarios.
 
-**Outbox Mode** (active when `qKafka.Outbox` is registered):
+**Outbox Mode** (active when the Outbox is registered):
 Saves the message to the Outbox table inside the caller's active `DbTransaction`.
 The `OutboxPublisher` background service dispatches it asynchronously.
 Guarantees At-Least-Once delivery even if the broker is down at publish time.
@@ -45,7 +45,7 @@ Guarantees At-Least-Once delivery even if the broker is down at publish time.
 ```csharp
 /// <summary>
 /// Publishes messages to Kafka topics from any application component.
-/// When qKafka.Outbox is registered, publishing is routed through the
+/// When the Outbox is registered, publishing is routed through the
 /// Transactional Outbox for At-Least-Once delivery guarantees.
 /// </summary>
 public interface IKafkaPublisher

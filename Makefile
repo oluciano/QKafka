@@ -14,9 +14,7 @@ ifdef VERSION_PREFIX
 endif
 
 PROJECTS = \
-  src/qKafka/qKafka.csproj \
-  src/qKafka.Outbox/qKafka.Outbox.csproj \
-  src/qKafka.Sagas/qKafka.Sagas.csproj
+  src/qKafka/qKafka.csproj
 
 .PHONY: pack publish clean-pack
 
