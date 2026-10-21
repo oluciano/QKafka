@@ -11,7 +11,7 @@ description: >-
 Workflow for **qKafka** (.NET 10+). Modes live in `ai-method/modes/`, workflows in `ai-method/workflows/`, invariants in `ai-method/core/00-foundation-minimal.md`.
 
 ```
-Phase 0 Grooming ► Phase 1 Pre-flight ► Phase 2 3N tests ► Phase 3 Implementation
+Phase 0 Grooming (card) ► Phase 1 Pre-flight ► Phase 2 3N tests ► Phase 3 Implementation
       ► Phase 4 Verification gate ► Phase 5 Docs & changelog ► Phase 6 Handoff / PR
 ```
 
@@ -19,12 +19,13 @@ Phase 0 Grooming ► Phase 1 Pre-flight ► Phase 2 3N tests ► Phase 3 Impleme
 
 Mode: `ai-method/modes/01-architect-mode.md`.
 
+0. **Backlog first.** Every non-trivial task starts from a work item in the internal Plane backlog (`~/plane-selfhost/plane.py`, project `QK`). Find it (`plane.py list`) or create it (`plane.py new`), move it to *In Progress* now, and reference `QK-n` in the commit subject or body. Trivial fixes (typo, formatting) need no card.
 1. Read the request, `ROADMAP.md` (phase it belongs to) and the related `specs/NN-*.md`.
 2. Inspect the relevant code read-only (use a research subagent if the area is large).
 3. Produce: overview, classes and signatures, execution flow, edge cases, invariant compliance, 3N matrix.
 4. **Spec before code:** every task has a `specs/NN-name.md` (see `ai-method/templates/`). Create or update it first. No spec, no code.
 5. Ask the user only for real trade-offs (2 to 4 options, recommended first).
-6. Optionally open a GitHub issue (English, `type(scope): description`) with context, target files, current vs expected behavior, DoD and 3N plan.
+6. Put context, target files, current vs expected behavior, DoD and the 3N plan in the work item description (English, `type(scope): description`). Do **not** open public GitHub issues for design questions or open decisions: the repository is public, the backlog is not.
 
 Deep questions (rebalance, ordering, offsets, outbox, saga): `references/grooming-guide.md`.
 
@@ -73,4 +74,4 @@ Fix production code, not tests. Report real output; if something was not run, sa
 
 ## Phase 6 — Handoff
 
-Use `ai-method/templates/execution-handoff-template.md` and `validation-report-template.md`. Commit with a conventional message (`feat(scope): ...`); open a PR to `main` only when the user asks. Tick the ROADMAP item only after the verification gate passes.
+Use `ai-method/templates/execution-handoff-template.md` and `validation-report-template.md`. Commit with a conventional message (`feat(scope): ...`); open a PR to `main` only when the user asks. Tick the ROADMAP item only after the verification gate passes. Then move the card to *Done* (`plane.py move QK-n Done`) and add a comment with the commit hash. Never move a card to *Done* before CI is green.
