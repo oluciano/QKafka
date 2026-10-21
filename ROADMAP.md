@@ -32,6 +32,22 @@ A new package is only justified by a heavy or incompatible dependency (e.g. Sche
 
 ---
 
+## 🔖 Versioning & API Stability
+**Policy:** `0.x` until the API has earned a `1.0.0`. We do not stay in beta forever and we do not bump majors to fix our own early mistakes.
+
+- **Prevent the churn at the source:** `internal` by default. Only what a user must touch is public, and no `Confluent.Kafka` type appears in the public API. Every public symbol is declared in `src/qKafka/PublicAPI.Unshipped.txt`, so an API change is visible in review and fails the build until declared.
+- **`0.x` (now):** breaking changes allowed in a minor (`0.1` → `0.2`), always listed under `### Breaking` in the CHANGELOG. Pre-releases use `alpha` → `beta` → `rc` tags (`v0.1.0-alpha.1`, MinVer).
+- **`1.0.0` exit criteria (by criteria, not by date):**
+  1. Phases 1–3 complete (consumer engine, Outbox/Inbox, Sagas).
+  2. The 3N matrix and the reliability tests pass against a real Kafka.
+  3. The public API was reviewed line by line in `PublicAPI.Shipped.txt` (nullability, stringly-typed options, extension points such as the partition listener and custom middleware).
+  4. At least one real application (e.g. NexJob) runs on it for a meaningful period.
+- **After `1.0`:** a public member is first marked `[Obsolete]` for at least one minor, and removed only in a major. Majors at most once a year, aligned with a .NET release. Package Validation (`EnablePackageValidation`) is enabled at `1.0` to catch accidental breaks against the previous release.
+- **Escape hatch:** risky or unfinished surfaces (Saga DSL, Dashboard, custom middleware registration) ship with `[Experimental]` and may change in a minor, even after `1.0`.
+- **Supported runtime:** `net10.0` only. `net8.0` is added back only on real demand.
+
+---
+
 ## 🛠️ Reference Architecture
 
 ```

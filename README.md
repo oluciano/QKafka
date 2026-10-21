@@ -164,6 +164,10 @@ Phase 5 — Test Harness        (v1.0.0)
   ⏳ In-memory saga & outbox support
 ```
 
+## Versioning & Contributing
+
+qKafka is `0.x`: the API can change in a minor release, and every break is listed in the CHANGELOG. The criteria for `1.0.0` and the stability policy are in [ROADMAP.md](ROADMAP.md#-versioning--api-stability). To contribute, read [CONTRIBUTING.md](CONTRIBUTING.md).
+
 ---
 
 <div align="center">
