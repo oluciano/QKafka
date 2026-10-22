@@ -46,50 +46,15 @@ internal sealed class KafkaConsumerLoop : BackgroundService
         _environment = environment;
     }
 
-    /// <inheritdoc/>
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    /// <summary>
+    /// Polls the consumer, applies backpressure and routes each message until cancellation, then closes the consumer.
+    /// </summary>
+    /// <param name="consumer">The subscribed consumer.</param>
+    /// <param name="dispatcher">The dispatcher feeding the partition workers.</param>
+    /// <param name="stoppingToken">The token signalling shutdown.</param>
+    /// <returns>A task that completes when the loop ends.</returns>
+    internal async Task PollAsync(IConsumer<byte[], byte[]> consumer, ChannelDispatcher dispatcher, CancellationToken stoppingToken)
     {
-        // 1. Topic auto-provisioning check
-        await AutoProvisionTopicAsync(stoppingToken).ConfigureAwait(false);
-
-        // 2. Resolve options
-        _options.Consumers.TryGetValue(_registration.GroupId, out var consumerOptions);
-        consumerOptions ??= new ConsumerOptions();
-
-        int concurrencyLimit = consumerOptions.ConcurrencyLimit > 0 ? consumerOptions.ConcurrencyLimit : 3;
-
-        // 3. Create dispatcher and workers
-        var dispatcher = new ChannelDispatcher(concurrencyLimit);
-        var retryOptions = consumerOptions.Retry;
-
-        var builder = new KafkaPipelineBuilder();
-        builder.UseMiddleware(new LoggingMiddleware(_loggerFactory.CreateLogger<LoggingMiddleware>()));
-        builder.UseMiddleware(new ScopeMiddleware(_serviceProvider));
-        builder.UseMiddleware(new RetryMiddleware(retryOptions, _dltPublisher, _loggerFactory.CreateLogger<RetryMiddleware>()));
-
-        var execMiddleware = (IKafkaConsumerMiddleware)ActivatorUtilities.CreateInstance(
-            _serviceProvider,
-            typeof(ExecutionMiddleware<,>).MakeGenericType(_registration.ConsumerType, _registration.MessageType));
-        builder.UseMiddleware(execMiddleware);
-
-        var pipelineExecutor = builder.Build(_ => Task.CompletedTask);
-
-        var workers = new PartitionWorker[concurrencyLimit];
-        for (int i = 0; i < concurrencyLimit; i++)
-        {
-            workers[i] = new PartitionWorker(dispatcher.Channels[i].Reader, new Func<IKafkaContext, Task>(pipelineExecutor), _serviceProvider);
-        }
-
-        // 4. Build and subscribe consumer
-        using var consumer = BuildConsumer(consumerOptions);
-        consumer.Subscribe(_registration.Topic);
-
-        _logger.LogInformation(
-            "Subscribed to topic '{Topic}' using consumer group '{GroupId}' with concurrency {ConcurrencyLimit}.",
-            _registration.Topic,
-            _registration.GroupId,
-            concurrencyLimit);
-
         bool isPaused = false;
 
         try
@@ -177,7 +142,59 @@ internal sealed class KafkaConsumerLoop : BackgroundService
             {
                 _logger.LogError(ex, "Error closing Kafka consumer.");
             }
+        }
+    }
 
+    /// <inheritdoc/>
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        // 1. Topic auto-provisioning check
+        await AutoProvisionTopicAsync(stoppingToken).ConfigureAwait(false);
+
+        // 2. Resolve options
+        _options.Consumers.TryGetValue(_registration.GroupId, out var consumerOptions);
+        consumerOptions ??= new ConsumerOptions();
+
+        int concurrencyLimit = consumerOptions.ConcurrencyLimit > 0 ? consumerOptions.ConcurrencyLimit : 3;
+
+        // 3. Create dispatcher and workers
+        var dispatcher = new ChannelDispatcher(concurrencyLimit);
+        var retryOptions = consumerOptions.Retry;
+
+        var builder = new KafkaPipelineBuilder();
+        builder.UseMiddleware(new LoggingMiddleware(_loggerFactory.CreateLogger<LoggingMiddleware>()));
+        builder.UseMiddleware(new ScopeMiddleware(_serviceProvider));
+        builder.UseMiddleware(new RetryMiddleware(retryOptions, _dltPublisher, _loggerFactory.CreateLogger<RetryMiddleware>()));
+
+        var execMiddleware = (IKafkaConsumerMiddleware)ActivatorUtilities.CreateInstance(
+            _serviceProvider,
+            typeof(ExecutionMiddleware<,>).MakeGenericType(_registration.ConsumerType, _registration.MessageType));
+        builder.UseMiddleware(execMiddleware);
+
+        var pipelineExecutor = builder.Build(_ => Task.CompletedTask);
+
+        var workers = new PartitionWorker[concurrencyLimit];
+        for (int i = 0; i < concurrencyLimit; i++)
+        {
+            workers[i] = new PartitionWorker(dispatcher.Channels[i].Reader, new Func<IKafkaContext, Task>(pipelineExecutor), _serviceProvider);
+        }
+
+        // 4. Build and subscribe consumer
+        using var consumer = BuildConsumer(consumerOptions);
+        consumer.Subscribe(_registration.Topic);
+
+        _logger.LogInformation(
+            "Subscribed to topic '{Topic}' using consumer group '{GroupId}' with concurrency {ConcurrencyLimit}.",
+            _registration.Topic,
+            _registration.GroupId,
+            concurrencyLimit);
+
+        try
+        {
+            await PollAsync(consumer, dispatcher, stoppingToken).ConfigureAwait(false);
+        }
+        finally
+        {
             for (int i = 0; i < concurrencyLimit; i++)
             {
                 try
@@ -300,72 +317,18 @@ internal sealed class KafkaConsumerLoop : BackgroundService
 
         var consumerBuilder = new ConsumerBuilder<byte[], byte[]>(config);
 
+        var notifier = new PartitionAssignmentNotifier(_serviceProvider, _logger);
+
         consumerBuilder.SetPartitionsAssignedHandler((c, partitions) =>
         {
             _logger.LogInformation("Partitions assigned: {Partitions}", string.Join(", ", partitions));
-
-            _ = Task.Run(async () =>
-            {
-                using (var scope = _serviceProvider.CreateScope())
-                {
-                    var listeners = scope.ServiceProvider.GetServices<IPartitionAssignmentListener>();
-                    var dummyContext = new KafkaContext(
-                        null,
-                        -1,
-                        -1,
-                        string.Empty,
-                        new Dictionary<string, byte[]>(StringComparer.Ordinal),
-                        Array.Empty<byte>(),
-                        scope.ServiceProvider,
-                        CancellationToken.None);
-
-                    foreach (var listener in listeners)
-                    {
-                        try
-                        {
-                            await listener.OnPartitionsAssignedAsync(dummyContext, partitions).ConfigureAwait(false);
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.LogError(ex, "Error in partition assignment listener.");
-                        }
-                    }
-                }
-            });
+            _ = Task.Run(() => notifier.NotifyAssignedAsync(partitions));
         });
 
         consumerBuilder.SetPartitionsRevokedHandler((c, partitions) =>
         {
             _logger.LogInformation("Partitions revoked: {Partitions}", string.Join(", ", partitions));
-
-            _ = Task.Run(async () =>
-            {
-                using (var scope = _serviceProvider.CreateScope())
-                {
-                    var listeners = scope.ServiceProvider.GetServices<IPartitionAssignmentListener>();
-                    var dummyContext = new KafkaContext(
-                        null,
-                        -1,
-                        -1,
-                        string.Empty,
-                        new Dictionary<string, byte[]>(StringComparer.Ordinal),
-                        Array.Empty<byte>(),
-                        scope.ServiceProvider,
-                        CancellationToken.None);
-
-                    foreach (var listener in listeners)
-                    {
-                        try
-                        {
-                            await listener.OnPartitionsRevokedAsync(dummyContext, partitions).ConfigureAwait(false);
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.LogError(ex, "Error in partition revocation listener.");
-                        }
-                    }
-                }
-            });
+            _ = Task.Run(() => notifier.NotifyRevokedAsync(partitions));
         });
 
         return consumerBuilder.Build();

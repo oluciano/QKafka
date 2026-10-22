@@ -1,4 +1,2 @@
 # Production files with logic that still have no <path>/<Name>UnitTests.cs. This list only shrinks:
 # remove a line when its unit test is added (the build-time convention test fails if you forget).
-KafkaConsumerLoop.cs
-PartitionWorker.cs
