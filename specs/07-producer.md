@@ -26,6 +26,16 @@ injectable service; consumers and sagas publish through it.
               └─► Outbox Mode: IOutboxStore → Database → OutboxPublisher → Kafka Broker
 ```
 
+### Direct Mode details
+
+* The payload is produced by `IKafkaMessageSerializer` (JSON by default; replace it together
+  with `IKafkaMessageDeserializer` for another wire format).
+* One `IProducer<byte[], byte[]>` is shared by the publisher and the Dead Letter Topic
+  publisher, configured with `acks=all` and idempotence enabled. `BootstrapServers` is
+  required: an empty value fails fast when the producer is first resolved.
+* `PublishAsync` completes only after the broker acknowledged the message and throws if it
+  did not. The `qkafka-message-type` header carries `Type.FullName`.
+
 ### Two Publishing Modes
 
 **Direct Mode** (default when the Outbox is not registered):
@@ -72,14 +82,13 @@ public interface IKafkaPublisher
 }
 ```
 
-### Topic Resolution Convention
+### Topic Resolution
 
-When `PublishAsync<TMessage>` is called without an explicit topic, the engine resolves
-the target topic in the following order of precedence:
-
-1. `[KafkaTopic("topic-name")]` attribute on the message class.
-2. Convention: `typeof(TMessage).Name` converted to `kebab-case` + `-topic`
-   (e.g. `OrderPlaced` → `order-placed-topic`).
+`PublishAsync<TMessage>` publishes to the topic declared with `[KafkaTopic("topic-name")]`
+on the message class. There is **no naming convention**: a message without the attribute
+fails fast with an `InvalidOperationException` naming the type, instead of silently
+publishing to a topic nobody created. To publish elsewhere, call `PublishToAsync` with
+an explicit topic (it ignores the attribute).
 
 ```csharp
 /// <summary>
@@ -169,5 +178,5 @@ public sealed class OrderController : ControllerBase
 ### N3 — Invalid Input:
 * `message` argument is null: Assert `ArgumentNullException` is thrown immediately.
 * `PublishToAsync` called with null or empty topic: Assert `ArgumentException` is thrown.
-* Message type has no `[KafkaTopic]` attribute and the name cannot be resolved:
+* Message type has no `[KafkaTopic]` attribute and `PublishAsync` is used:
   Assert a clear `InvalidOperationException` with the message type name included.

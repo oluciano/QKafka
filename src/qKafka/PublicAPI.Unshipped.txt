@@ -68,3 +68,11 @@ QKafka.Sagas.Saga<TSagaState>.State.set -> void
 QKafka.ServiceCollectionExtensions
 static QKafka.ServiceCollectionExtensions.AddqKafka(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, System.Action<QKafka.QKafkaOptions!>! configure) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
 static QKafka.ServiceCollectionExtensions.AddqKafkaConsumers(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, params System.Reflection.Assembly![]! assemblies) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
+QKafka.IKafkaMessageSerializer
+QKafka.IKafkaMessageSerializer.Serialize(object! message, System.Type! messageType) -> byte[]!
+QKafka.IKafkaPublisher
+QKafka.IKafkaPublisher.PublishAsync<TMessage>(TMessage! message, string? key = null, System.Threading.CancellationToken ct = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+QKafka.IKafkaPublisher.PublishToAsync<TMessage>(string! topic, TMessage! message, string? key = null, System.Threading.CancellationToken ct = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+QKafka.KafkaTopicAttribute
+QKafka.KafkaTopicAttribute.KafkaTopicAttribute(string! topic) -> void
+QKafka.KafkaTopicAttribute.Topic.get -> string!

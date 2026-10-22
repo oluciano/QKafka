@@ -31,6 +31,44 @@ public sealed class ServiceCollectionExtensionsUnitTests
     }
 
     [Fact]
+    public void AddqKafka_Called_ResolvesThePublisherAndSharesOneProducerWithTheDltPublisher()
+    {
+        var services = new ServiceCollection();
+        services.AddLogging();
+        services.AddqKafka(o => o.BootstrapServers = "localhost:1");
+        using var provider = services.BuildServiceProvider();
+
+        Assert.IsType<KafkaPublisher>(provider.GetRequiredService<IKafkaPublisher>());
+        Assert.IsType<JsonKafkaMessageSerializer>(provider.GetRequiredService<IKafkaMessageSerializer>());
+        Assert.NotNull(provider.GetRequiredService<IDltPublisher>());
+        Assert.Same(
+            provider.GetRequiredService<Confluent.Kafka.IProducer<byte[], byte[]>>(),
+            provider.GetRequiredService<Confluent.Kafka.IProducer<byte[], byte[]>>());
+    }
+
+    [Fact]
+    public void BlankBootstrapServers_PublisherResolved_FailsFastInsteadOfDroppingMessages()
+    {
+        var services = new ServiceCollection();
+        services.AddqKafka(_ => { });
+        using var provider = services.BuildServiceProvider();
+
+        Assert.Throws<InvalidOperationException>(() => provider.GetRequiredService<IKafkaPublisher>());
+    }
+
+    [Fact]
+    public void CustomSerializerRegisteredFirst_AddqKafka_DoesNotOverrideIt()
+    {
+        var services = new ServiceCollection();
+        var custom = new JsonKafkaMessageSerializer();
+        services.AddSingleton<IKafkaMessageSerializer>(custom);
+
+        services.AddqKafka(_ => { });
+
+        Assert.Same(custom, services.BuildServiceProvider().GetRequiredService<IKafkaMessageSerializer>());
+    }
+
+    [Fact]
     public void CustomDeserializerRegisteredFirst_AddqKafka_DoesNotOverrideIt()
     {
         var services = new ServiceCollection();

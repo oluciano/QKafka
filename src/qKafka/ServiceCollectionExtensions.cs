@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using Confluent.Kafka;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
@@ -36,6 +37,9 @@ public static class ServiceCollectionExtensions
         services.AddSingleton(options);
 
         services.TryAddSingleton<IKafkaMessageDeserializer, JsonKafkaMessageDeserializer>();
+        services.TryAddSingleton<IKafkaMessageSerializer, JsonKafkaMessageSerializer>();
+        services.TryAddSingleton<IProducer<byte[], byte[]>>(sp => KafkaProducerFactory.Create(sp.GetRequiredService<QKafkaOptions>()));
+        services.TryAddSingleton<IKafkaPublisher, KafkaPublisher>();
         services.TryAddSingleton<IDltPublisher, DltPublisher>();
 
         return services;

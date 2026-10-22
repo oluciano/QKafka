@@ -8,49 +8,22 @@ using Microsoft.Extensions.Logging;
 namespace QKafka;
 
 /// <summary>
-/// Default implementation of <see cref="IDltPublisher"/> using a Kafka producer.
+/// Default implementation of <see cref="IDltPublisher"/> using the shared Kafka producer.
 /// </summary>
-internal sealed class DltPublisher : IDltPublisher, IDisposable
+internal sealed class DltPublisher : IDltPublisher
 {
-    private readonly IProducer<byte[], byte[]>? _producer;
+    private readonly IProducer<byte[], byte[]> _producer;
     private readonly ILogger<DltPublisher> _logger;
-    private bool _disposed;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DltPublisher"/> class.
     /// </summary>
-    /// <param name="options">The global configuration options.</param>
+    /// <param name="producer">The shared Kafka producer.</param>
     /// <param name="logger">The logger instance.</param>
-    public DltPublisher(QKafkaOptions options, ILogger<DltPublisher> logger)
+    public DltPublisher(IProducer<byte[], byte[]> producer, ILogger<DltPublisher> logger)
     {
-        if (options == null)
-        {
-            throw new ArgumentNullException(nameof(options));
-        }
-
+        _producer = producer ?? throw new ArgumentNullException(nameof(producer));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-
-        if (!string.IsNullOrEmpty(options.BootstrapServers))
-        {
-            var config = new ProducerConfig
-            {
-                BootstrapServers = options.BootstrapServers,
-                SaslUsername = options.SaslUsername,
-                SaslPassword = options.SaslPassword,
-            };
-
-            if (options.SaslMechanism != null)
-            {
-                config.SaslMechanism = Enum.Parse<SaslMechanism>(options.SaslMechanism, true);
-            }
-
-            if (options.SecurityProtocol != null)
-            {
-                config.SecurityProtocol = Enum.Parse<SecurityProtocol>(options.SecurityProtocol, true);
-            }
-
-            _producer = new ProducerBuilder<byte[], byte[]>(config).Build();
-        }
     }
 
     /// <inheritdoc/>
@@ -64,12 +37,6 @@ internal sealed class DltPublisher : IDltPublisher, IDisposable
         if (original == null)
         {
             throw new ArgumentNullException(nameof(original));
-        }
-
-        if (_producer == null)
-        {
-            _logger.LogWarning("DLT Publisher is not configured (BootstrapServers is empty). Message not routed.");
-            return;
         }
 
         var dltTopic = $"{original.Topic}.dlt";
@@ -127,18 +94,6 @@ internal sealed class DltPublisher : IDltPublisher, IDisposable
             throw;
         }
 #pragma warning restore S2139
-    }
-
-    /// <inheritdoc/>
-    public void Dispose()
-    {
-        if (_disposed)
-        {
-            return;
-        }
-
-        _producer?.Dispose();
-        _disposed = true;
     }
 
     private static void AddHeader(Headers headers, string key, string value)
