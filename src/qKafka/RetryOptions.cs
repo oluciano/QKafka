@@ -8,7 +8,9 @@ namespace QKafka;
 public sealed class RetryOptions
 {
     /// <summary>
-    /// Gets or sets the maximum retry attempts.
+    /// Gets or sets how many times a failed message is retried after its first execution.
+    /// The handler runs at most <c>1 + MaxRetryAttempts</c> times before the message is routed to the
+    /// Dead Letter Topic (the default of 3 means 4 executions). <c>0</c> disables retries; a negative value is treated as <c>0</c>.
     /// </summary>
     public int MaxRetryAttempts { get; set; } = 3;
 

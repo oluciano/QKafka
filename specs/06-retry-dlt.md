@@ -49,7 +49,7 @@ Triggered inside `RetryMiddleware` when `IKafkaConsumer<T>.ConsumeAsync` throws.
 
 | Setting             | Default | Description                                                     |
 |---------------------|---------|-----------------------------------------------------------------|
-| `MaxRetryAttempts`  | `3`     | Number of attempts before routing to DLT. `0` = no retries.    |
+| `MaxRetryAttempts`  | `3`     | Retries after the first execution (default = 4 executions). `0` = no retries. |
 | `InitialDelay`      | `250ms` | Delay before the first retry.                                   |
 | `BackoffMultiplier` | `2.0`   | Multiplier applied to delay on each attempt.                    |
 | `MaxDelay`          | `30s`   | Cap on delay growth regardless of multiplier.                   |
@@ -115,7 +115,7 @@ must be present in addition to all original message headers:
 | `qkafka-dlt-reason`             | `"poison-pill"` or `"max-retries-exceeded"`                        |
 | `qkafka-dlt-exception-type`     | Full exception type name (Scenario B only)                         |
 | `qkafka-dlt-exception-message`  | Exception message truncated to 500 chars (Scenario B only)         |
-| `qkafka-dlt-attempt-count`      | Number of attempts made before routing to DLT                      |
+| `qkafka-dlt-attempt-count`      | Executions made before routing to DLT (1 + retries)                   |
 | `qkafka-dlt-timestamp`          | UTC ISO-8601 timestamp of the DLT routing event                    |
 
 ### DLT Topic Naming Convention
@@ -191,7 +191,7 @@ public enum DltReason
   attempts and final `Processed` status.
 
 ### N2 — Negative:
-* Consumer fails on all `MaxRetryAttempts`: Assert message is published to `<topic>.dlt`
+* Consumer fails the first execution and all `MaxRetryAttempts` retries (`1 + MaxRetryAttempts` executions): Assert message is published to `<topic>.dlt`
   with all required headers, offset is committed, and Inbox is marked `Failed`.
 * DLT publish itself fails: Assert the exception is logged, the offset is NOT committed,
   and the pipeline does not crash.

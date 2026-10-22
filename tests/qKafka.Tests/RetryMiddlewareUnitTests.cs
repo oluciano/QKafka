@@ -59,6 +59,24 @@ public sealed class RetryMiddlewareUnitTests
     }
 
     [Fact]
+    public async Task DefaultOptions_AlwaysFails_RunsOnceThenThreeRetries_ReportsFourAttempts()
+    {
+        var dlt = new RecordingDltPublisher();
+        var options = new RetryOptions { InitialDelayMs = 0, MaxDelayMs = 0 };
+        var sut = new RetryMiddleware(options, dlt, new ListLogger<RetryMiddleware>());
+        var calls = 0;
+
+        await sut.InvokeAsync(TestKafka.Context(TestKafka.Message("k")), () =>
+        {
+            calls++;
+            throw new InvalidOperationException("boom");
+        });
+
+        Assert.Equal(1 + options.MaxRetryAttempts, calls);
+        Assert.Equal(4, Assert.Single(dlt.Published).Attempts);
+    }
+
+    [Fact]
     public async Task AlwaysFails_RetriesExhausted_RoutesToDltOnceAndSwallows()
     {
         var dlt = new RecordingDltPublisher();
