@@ -18,7 +18,4 @@ internal sealed class StubKafkaContext : IKafkaContext
     public byte[] Payload => Array.Empty<byte>();
 
     public IServiceProvider RequestServices { get; } = new ServiceCollection().BuildServiceProvider();
-
-    public Task PublishAsync<TMessage>(TMessage message, string? key = null)
-        where TMessage : class => Task.CompletedTask;
 }

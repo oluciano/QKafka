@@ -49,7 +49,7 @@ This document guides you through the step-by-step lifecycle of both outgoing (Ou
 ### Phase A: The Publishing Path (Transactional Outbox)
 This phase ensures **At-Least-Once delivery** without relying on two-phase commits.
 
-1. **Atomic Write:** The user calls `context.PublishAsync` or maps database transactions. The system writes the business entity changes and the outbound Kafka message (payload, headers, and topic) inside the **same database transaction**.
+1. **Atomic Write:** The user calls `IKafkaPublisher.PublishAsync` (planned, spec 07) or maps database transactions. The system writes the business entity changes and the outbound Kafka message (payload, headers, and topic) inside the **same database transaction**.
 2. **Persistence:** If the transaction succeeds, the message is stored in the `qkafka_outbox` table with `dispatched_at = NULL`. If the transaction rolls back, nothing is written.
 3. **Background Dispatch:** The `OutboxPublisher` runs as a background service. It polls the database using concurrency safe queries (`SKIP LOCKED`) to fetch the oldest unpublished rows.
 4. **Broker Handshake:** The publisher sends the message to the Kafka broker.

@@ -229,9 +229,9 @@ using QKafka;
 public sealed class OrderController : ControllerBase
 {
     private readonly AppDbContext _db;
-    private readonly IKafkaContext _kafka;
+    private readonly IKafkaPublisher _kafka;
 
-    public OrderController(AppDbContext db, IKafkaContext kafka)
+    public OrderController(AppDbContext db, IKafkaPublisher kafka)
     {
         _db = db;
         _kafka = kafka;

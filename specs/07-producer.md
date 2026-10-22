@@ -7,10 +7,10 @@ enabling any application component to publish messages to Kafka without being a 
 
 ## 1. Problem
 
-`IKafkaContext.PublishAsync` is scoped to an active consumption pipeline. A developer
-who wants to publish from a controller, a background service, or a domain event handler
-has no injection point today. This spec introduces `IKafkaPublisher` as a first-class
-injectable service.
+There is no way to publish from a controller, a background service, or a domain event
+handler: the prototype `IKafkaContext.PublishAsync` (which published nothing) was removed
+before the first release. This spec introduces `IKafkaPublisher` as a first-class
+injectable service; consumers and sagas publish through it.
 
 ---
 

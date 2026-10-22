@@ -44,14 +44,4 @@ public interface IKafkaContext
     /// Gets the scoped service provider for dependency resolution.
     /// </summary>
     IServiceProvider RequestServices { get; }
-
-    /// <summary>
-    /// Publishes a message to a topic.
-    /// </summary>
-    /// <typeparam name="TMessage">The type of the message.</typeparam>
-    /// <param name="message">The message payload.</param>
-    /// <param name="key">Optional partition key.</param>
-    /// <returns>A task representing the asynchronous publish operation.</returns>
-    Task PublishAsync<TMessage>(TMessage message, string? key = null)
-        where TMessage : class;
 }

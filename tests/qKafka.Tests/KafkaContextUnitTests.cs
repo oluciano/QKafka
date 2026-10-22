@@ -57,12 +57,4 @@ public sealed class KafkaContextUnitTests
         Assert.Throws<ArgumentNullException>(() => new KafkaContext(null, 0, 0, "k", headers, null!, services, default));
         Assert.Throws<ArgumentNullException>(() => new KafkaContext(null, 0, 0, "k", headers, payload, null!, default));
     }
-
-    [Fact]
-    public async Task NullMessage_Published_ThrowsArgumentNull()
-    {
-        var sut = TestKafka.Context(TestKafka.Message("k"));
-
-        await Assert.ThrowsAsync<ArgumentNullException>(() => sut.PublishAsync<OrderPlaced>(null!));
-    }
 }

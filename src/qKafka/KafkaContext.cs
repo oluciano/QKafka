@@ -67,18 +67,4 @@ internal sealed class KafkaContext : IKafkaContext
 
     /// <inheritdoc/>
     public IServiceProvider RequestServices { get; set; }
-
-    /// <inheritdoc/>
-    public async Task PublishAsync<TMessage>(TMessage message, string? key = null)
-        where TMessage : class
-    {
-        if (message == null)
-        {
-            throw new ArgumentNullException(nameof(message));
-        }
-
-        // Prototype implementation for writing to outbox/producer:
-        // Will be connected to IProducer / IOutboxStore in future phases.
-        await Task.CompletedTask.ConfigureAwait(false);
-    }
 }

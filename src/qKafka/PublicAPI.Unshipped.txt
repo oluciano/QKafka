@@ -19,7 +19,6 @@ QKafka.IKafkaContext.Key.get -> string!
 QKafka.IKafkaContext.Offset.get -> long
 QKafka.IKafkaContext.Partition.get -> int
 QKafka.IKafkaContext.Payload.get -> byte[]!
-QKafka.IKafkaContext.PublishAsync<TMessage>(TMessage! message, string? key = null) -> System.Threading.Tasks.Task!
 QKafka.IKafkaContext.RequestServices.get -> System.IServiceProvider!
 QKafka.IKafkaMessageDeserializer
 QKafka.IKafkaMessageDeserializer.Deserialize(byte[]! data, System.Type! targetType) -> object!
